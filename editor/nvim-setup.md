@@ -61,7 +61,7 @@ gruvbox 다크 테마와 기본 내장 기능(LSP/Treesitter)을 중심으로, �
 현재 버퍼에서 hunk 단위 변경을 빠르게 확인/이동하는 데 집중한다. 내 흐름에서는 “프로젝트 단위 비교 전에, 지금 보고 있는 파일이 얼마나 바뀌었는지”를 먼저 가볍게 확인하는 용도로 쓴다. gutter 표시(`│`, `_`, `‾`, `~`)와 preview/blame/diff를 통해 작은 범위를 먼저 점검하고, 필요할 때만 fugitive/diffview로 범위를 넓힌다.
 
 ### `tpope/vim-fugitive`
-`:Git` 인터페이스를 중심으로 status, blame, log, 파일 diff 같은 “Git 조작”을 텍스트 기반으로 통합한다. 내 설정에서는 status 창을 기준점으로 두고, 변경 파일 목록을 훑은 뒤 필요한 파일만 diff로 열어 확인하는 흐름에 맞춰 사용한다. gitsigns가 파일 내부의 작은 확인이라면, fugitive는 “이번 작업에서 무엇이 바뀌었는지”를 프로젝트 단위로 정리하는 허브에 가깝다.
+`:Git` 인터페이스를 중심으로 status, blame, log, 파일 diff 같은 “Git 조작”을 텍스트 기반으로 통합한다. 내 설정에서는 status 창을 기준점으로 두고 변경 파일을 훑는 흐름과, `:Gvdiffsplit`처럼 파일 단위 diff를 깊게 보는 흐름을 구분해 쓴다. gitsigns가 파일 내부의 작은 확인이라면, fugitive는 “이번 작업에서 무엇이 바뀌었는지”를 프로젝트 단위로 정리하는 허브에 가깝다.
 
 ### `sindrets/diffview.nvim`
 브랜치 간 비교, 커밋 히스토리 탐색, 프로젝트 범위 diff를 시각적으로 다룬다. 내 사용에서는 working tree 점검(`:DiffviewOpen`)과 브랜치 간 비교(`:DiffviewOpen main`/`master`, 또는 `base...target`)를 분리해서 본다. fugitive가 현재 작업 상태 확인의 진입점이라면, diffview는 브랜치 단위 변화처럼 큰 범위를 검토하는 뷰어 역할이다.
@@ -77,16 +77,18 @@ gruvbox 다크 테마와 기본 내장 기능(LSP/Treesitter)을 중심으로, �
 
 2. **프로젝트 전체의 변경 파일 확인 — `vim-fugitive` status**
    - `<leader>gs` 또는 `:Git`으로 status 창을 연다.
-   - status 창에서 변경 파일 목록을 위아래로 이동하며 확인한다.
-   - 보고 싶은 파일 위에서 Enter로 열고, 필요하면 split/vsplit/tab으로 나눠 diff를 본다(예: `:Gvdiffsplit`, 또는 일반 창 분할 후 비교).
-   - 파일 하나를 보고 나면 이전 창으로 돌아오거나 다시 status 창으로 돌아가 다음 파일을 선택한다.
-   - 이렇게 status를 기준점으로 두면 “지금 작업셋에서 아직 확인 안 한 파일”을 놓치지 않기 쉽다.
+   - status 창에서 변경 파일 목록을 커서로 이동하며 확인한다.
+   - 먼저는 파일 위에서 Enter로 열어 내용/맥락을 훑는다. 필요하면 일반 Vim 방식으로 horizontal split, vertical split, tab을 열어 나란히 본다.
+   - 파일을 빠르게 훑은 뒤에는 이전 창으로 돌아오거나 status 창으로 다시 이동해 다음 파일을 선택한다.
+   - 특정 파일을 staged/worktree 기준으로 더 깊게 확인할 때만 `:Gvdiffsplit` 같은 별도 diff 명령으로 들어간다.
+   - 이렇게 status를 기준점으로 두면 “이번 작업셋에서 아직 확인 안 한 파일”을 놓치지 않기 쉽다.
 
 3. **브랜치 단위/큰 범위 비교 — `diffview.nvim`**
-   - working tree 기준 변경을 넓게 볼 때는 `<leader>do`(`:DiffviewOpen`)를 쓴다.
-   - 현재 브랜치를 `main`/`master`와 비교할 때는 `<leader>dm` 흐름을 쓰고, 특정 브랜치끼리는 `<leader>dB`(예: `base...target`)로 연다.
+   - 작업 중인 변경(working tree)을 프로젝트 단위로 볼 때는 `:DiffviewOpen`을 쓴다.
+   - 현재 브랜치를 `main`/`master`와 비교할 때는 `:DiffviewOpen main...HEAD`(또는 `master...HEAD`)처럼 기준점을 명시해 연다.
+   - 특정 브랜치끼리는 `:DiffviewOpen base...target` 형태로 연다.
    - 여기서 핵심은 **working tree diff**(내 작업 디렉터리 변화)와 **branch diff**(두 기준점 사이 변화)를 분리해서 이해하는 것이다.
-   - diffview의 파일 목록 패널에서 변경 파일을 이동하며 보고, 필요한 파일은 상세 diff 창에서 집중해서 확인한다.
+   - diffview의 파일 목록 패널에서 변경 파일을 이동하며 전체를 훑고, 변경량이 큰 파일은 상세 diff 창에서 집중해서 확인한다.
 
 요약하면, 현재 내 설정에서는 작은 범위는 gitsigns, 작업셋 기준 탐색은 fugitive status, 브랜치/히스토리 같은 큰 범위는 diffview로 나눠 쓴다. 작은 확인과 큰 비교를 한 도구에 억지로 몰지 않으면, 탭/분할로 컨텍스트를 유지한 채 검토 순서를 안정적으로 가져가기 쉽다.
 
