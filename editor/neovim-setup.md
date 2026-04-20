@@ -58,7 +58,7 @@ gruvbox 다크 테마와 기본 내장 기능(LSP/Treesitter)을 중심으로, �
 좌측 트리 중심의 파일 탐색을 담당한다. `follow_current_file`로 현재 편집 파일을 트리에서 자동 추적하고, 파일을 열면 트리를 닫아 코드 영역을 확보한다. 파일 “구조를 눈으로 훑는 작업”은 neo-tree가 맡고, “이름/내용 기반 탐색”은 telescope가 맡도록 역할을 나눴다.
 
 ### `lewis6991/gitsigns.nvim`
-현재 버퍼에서 hunk 단위 변경을 빠르게 확인/이동하는 데 집중한다. 내 흐름에서는 “프로젝트 단위 비교 전에, 지금 보고 있는 파일이 얼마나 바뀌었는지”를 먼저 가볍게 확인하는 용도로 쓴다. gutter 표시(`│`, `_`, `‾`, `~`)와 preview/blame/diff를 통해 작은 범위를 먼저 점검하고, 필요할 때만 fugitive/diffview로 범위를 넓힌다.
+현재 버퍼에서 hunk 단위 변경을 빠르게 확인/이동하는 데 집중한다. 내 흐름에서는 “프로젝트 단위 비교 전에, 지금 파일에서 어떤 덩어리가 바뀌었는지”를 먼저 보는 1차 점검 도구다. gutter 표시(`│`, `_`, `‾`, `~`)와 preview/blame/diff로 작은 범위를 짧게 확인하고, 변경 범위가 커질 때 fugitive/diffview로 넘어간다.
 
 ### `tpope/vim-fugitive`
 `:Git` 인터페이스를 중심으로 status, blame, log, 파일 diff 같은 “Git 조작”을 텍스트 기반으로 통합한다. 내 설정에서는 status 창을 기준점으로 두고 변경 파일을 훑는 흐름과, `:Gvdiffsplit`처럼 파일 단위 diff를 깊게 보는 흐름을 구분해 쓴다. gitsigns가 파일 내부의 작은 확인이라면, fugitive는 “이번 작업에서 무엇이 바뀌었는지”를 프로젝트 단위로 정리하는 허브에 가깝다.
@@ -78,9 +78,10 @@ gruvbox 다크 테마와 기본 내장 기능(LSP/Treesitter)을 중심으로, �
 2. **프로젝트 전체의 변경 파일 확인 — `vim-fugitive` status**
    - `<leader>gs` 또는 `:Git`으로 status 창을 연다.
    - status 창에서 변경 파일 목록을 커서로 이동하며 확인한다.
-   - 먼저는 파일 위에서 Enter로 열어 내용/맥락을 훑는다. 필요하면 일반 Vim 방식으로 horizontal split, vertical split, tab을 열어 나란히 본다.
-   - 파일을 빠르게 훑은 뒤에는 이전 창으로 돌아오거나 status 창으로 다시 이동해 다음 파일을 선택한다.
-   - 특정 파일을 staged/worktree 기준으로 더 깊게 확인할 때만 `:Gvdiffsplit` 같은 별도 diff 명령으로 들어간다.
+   - 파일 위에서 Enter로 열어 내용/맥락을 먼저 훑는다.
+   - 비교가 필요하면 일반 Vim 방식으로 horizontal split / vertical split / tab에 열어 컨텍스트를 유지한 채 본다.
+   - 파일을 빠르게 확인한 뒤에는 이전 창으로 돌아오거나 status 창으로 다시 이동해 다음 파일을 선택한다.
+   - staged/worktree 기준으로 더 깊은 비교가 필요할 때만 `:Gvdiffsplit` 같은 별도 diff 명령 흐름으로 들어간다.
    - 이렇게 status를 기준점으로 두면 “이번 작업셋에서 아직 확인 안 한 파일”을 놓치지 않기 쉽다.
 
 3. **브랜치 단위/큰 범위 비교 — `diffview.nvim`**
@@ -90,7 +91,7 @@ gruvbox 다크 테마와 기본 내장 기능(LSP/Treesitter)을 중심으로, �
    - 여기서 핵심은 **working tree diff**(내 작업 디렉터리 변화)와 **branch diff**(두 기준점 사이 변화)를 분리해서 이해하는 것이다.
    - diffview의 파일 목록 패널에서 변경 파일을 이동하며 전체를 훑고, 변경량이 큰 파일은 상세 diff 창에서 집중해서 확인한다.
 
-요약하면, 현재 내 설정에서는 작은 범위는 gitsigns, 작업셋 기준 탐색은 fugitive status, 브랜치/히스토리 같은 큰 범위는 diffview로 나눠 쓴다. 작은 확인과 큰 비교를 한 도구에 억지로 몰지 않으면, 탭/분할로 컨텍스트를 유지한 채 검토 순서를 안정적으로 가져가기 쉽다.
+요약하면, 현재 내 설정에서는 작은 범위는 gitsigns, 작업셋 기준 탐색은 fugitive status, 브랜치/히스토리 같은 큰 범위는 diffview로 나눠 쓴다. 작은 변경 확인과 큰 범위 비교를 분리하면 화면 전환 부담이 줄고, split/tab을 유지한 상태에서 검토 순서를 이어가기 쉽다.
 
 ### `iamcco/markdown-preview.nvim`
 마크다운 문서를 브라우저에서 즉시 렌더링해 확인한다. Mermaid까지 포함해 문서 결과물을 빠르게 검증할 수 있다. 코드 작성과 문서 미리보기를 Neovim 내부 키맵 하나로 왕복하는 용도로 사용한다.
