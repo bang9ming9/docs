@@ -16,14 +16,14 @@ Deployment를 `replicas: 1`로 두면 평소에는 한 개 Pod만 떠 있으니 
 
 즉, **“대부분의 시간에 1개”와 “절대로 1개만”은 다릅니다.**
 
-## 핵심 전제: Kubernetes는 singleton 절대보장 플랫폼이 아니다
+## 핵심 전제: Kubernetes 기본 설정만으로는 비즈니스 single-writer 보장이 충분하지 않다
 
-Kubernetes의 목표는 워크로드 생존성과 수렴(convergence)입니다. 현재 상태가 기대 상태와 다르면 다시 맞춰 가는 모델이지, 분산 잠금처럼 “전역 단일 실행 보증”을 강제하는 플랫폼은 아닙니다.
+Kubernetes의 목표는 워크로드 생존성과 수렴(convergence)입니다. 현재 상태가 기대 상태와 다르면 다시 맞춰 가는 모델이기 때문에, 기본 워크로드 primitives만으로 분산 잠금 수준의 “전역 단일 실행 보증”을 만들기는 어렵습니다.
 
 실무적으로 기억할 점은 두 가지입니다.
 
 1. **공백(window)**: 기존 Pod 종료와 신규 Pod 기동 사이에 소비 공백이 생길 수 있습니다.
-2. **중복(window)**: 종료 지연, 네트워크 지연, split-brain 유사 상황에서 짧은 중복 처리 가능성이 생깁니다.
+2. **중복(window)**: 종료 지연, readiness 전환 타이밍, 재시작/재할당 과정에서 짧은 중복 처리 가능성이 생길 수 있습니다.
 
 그래서 singleton 요구사항은 오케스트레이터 설정만으로 끝내기보다, **애플리케이션/데이터 계층의 안전장치**까지 포함해 설계해야 합니다.
 
@@ -55,9 +55,9 @@ Kubernetes의 목표는 워크로드 생존성과 수렴(convergence)입니다. 
 2. **rolling update 중 소비자 공백**
    - preStop/terminationGracePeriod 설정이 약하면 in-flight 처리 손실 위험
 
-3. **중복 실행 구간**
-   - 기존 Pod가 종료 중인데 새 Pod가 먼저 ready
-   - 동일 메시지 중복 소비/중복 write 가능
+3. **중복 처리 구간**
+   - 롤링 업데이트, 종료 지연, consumer group rebalance, readiness/lease handoff 타이밍이 겹칠 수 있음
+   - 그 결과 동일 메시지 중복 소비/중복 write 가능
 
 4. **DB write / publish 불일치**
    - 한쪽만 성공한 상태에서 장애
@@ -82,7 +82,7 @@ Kubernetes의 목표는 워크로드 생존성과 수렴(convergence)입니다. 
 
 중복 소비는 전제하고, 처리 결과가 한 번만 반영되게 만듭니다.
 
-- 메시지 고유 ID(또는 business key) 기반 dedupe
+- 메시지 불변 `event_id` 기반 dedupe를 기본으로 적용
 - "이미 처리됨" 기록 테이블/캐시
 - upsert/conditional update 활용
 
@@ -93,10 +93,10 @@ Kubernetes의 목표는 워크로드 생존성과 수렴(convergence)입니다. 
 DB 반영과 이벤트 발행을 느슨하게 연결해 불일치를 줄입니다.
 
 - 비즈니스 트랜잭션에서 도메인 변경 + outbox 레코드를 **같은 DB 트랜잭션**으로 저장
-- 별도 outbox relay가 outbox를 읽어 broker로 publish
+- outbox relay(별도 프로세스 또는 같은 애플리케이션 내부의 분리된 워커)가 outbox를 읽어 broker로 publish
 - publish 성공 시 outbox 상태 갱신
 
-이렇게 하면 "DB만 성공하고 publish 누락" 문제를 운영 가능한 형태로 바꿀 수 있습니다.
+이렇게 하면 "DB만 성공하고 publish 누락" 문제를, 유실 위험을 재시도 가능한 지연 문제로 전환해 다룰 수 있습니다.
 
 ### 4) graceful shutdown
 
@@ -116,7 +116,7 @@ DB 반영과 이벤트 발행을 느슨하게 연결해 불일치를 줄입니�
 
 ## B안: "1초 공백도 안 되고, 중복도 절대 불가"일 때
 
-이 요구사항은 일반적인 K8s singleton Pod 패턴으로 풀기 어렵습니다. 사실상 고가용성 + 강한 일관성 + 정확히 한 번 처리(exactly-once semantics)를 동시에 요구하기 때문입니다.
+이 요구사항은 일반적인 K8s singleton Pod 패턴으로 풀기 어렵습니다. 사실상 매우 강한 failover 요구와 중복 불가 요구를 동시에 만족해야 하기 때문입니다.
 
 현실적인 대안은 아래처럼 **제어 지점을 외부화/분리**하는 것입니다.
 
@@ -127,7 +127,7 @@ DB 반영과 이벤트 발행을 느슨하게 연결해 불일치를 줄입니�
 - **broker-native ordering 활용**: 파티션 키/싱글 파티션 등 브로커 순서 보장 기능에 설계 맞춤
 - **아키텍처 분리**: 초강한 보장이 필요한 경로만 별도 파이프라인으로 격리
 
-요점은 “K8s가 다 해주겠지”가 아니라, **요구 SLO에 맞는 제어면(control plane)을 따로 세워야 한다**는 것입니다.
+요점은 Kubernetes 기본 기능만으로 요구 SLO를 충족한다고 가정하면 위험하며, **요구 SLO에 맞는 제어면(control plane)을 별도로 설계해야 한다**는 것입니다.
 
 ## Outbox pattern을 조금 더 구체적으로
 
@@ -159,7 +159,9 @@ idempotency는 중복 처리 현실을 흡수하는 핵심 장치입니다.
 - 외부 호출은 idempotency key 지원 API를 우선 사용
 - "처리 성공 후 ack" 원칙을 유지하되, 재시도 시 동일 결과 보장
 
-주의할 점은, idempotency는 "중복을 허용"하는 게 아니라 **중복이 발생해도 의미가 변하지 않게 하는 설계**라는 것입니다.
+주의할 점은, business key만 dedupe 키로 쓰면 정상적인 재이벤트까지 막을 수 있으므로 `event_id`를 기본 키로 두고 business key는 보조 조건으로 쓰는 편이 안전합니다.
+
+idempotency는 "중복을 허용"하는 게 아니라 **중복이 발생해도 의미가 변하지 않게 하는 설계**라는 점을 기억해야 합니다.
 
 ## StatefulSet, PDB 등의 한계
 
@@ -180,7 +182,7 @@ singleton 운영에서 자주 오해되는 부분을 정리하면:
 정리하면:
 
 - `replica=1`은 출발점일 뿐 최종 해답이 아니다.
-- Kubernetes는 singleton 절대보장 플랫폼이 아니다.
+- Kubernetes 기본 설정만으로는 비즈니스 의미의 single-writer 보장을 충분히 만들기 어렵다.
 - DB write와 publish는 분리된 side effect라 outbox/idempotency가 필수다.
 - 수 초 failover 허용이면 "replica 2~3 + leader election + idempotent consumer + outbox + graceful shutdown" 조합이 실무적으로 가장 균형적이다.
 - 1초 공백도/중복도 허용 불가면 K8s 기본 패턴 밖의 제어 장치를 포함한 별도 아키텍처가 필요하다.
@@ -191,4 +193,4 @@ singleton 운영에서 자주 오해되는 부분을 정리하면:
 
 ## 짧은 요약
 
-Kubernetes에서 `replica=1` singleton Pod 운영은 간단하지만 공백/중복 가능성을 제거하지 못한다. DB write 후 publish 순서는 타당해도 두 작업은 분리된 side effect라 장애 시 불일치가 생긴다. 실무적으로는 failover를 몇 초 허용할 수 있다면 replica 2~3, leader election, idempotent consumer, outbox pattern, graceful shutdown 조합이 권장된다. 반대로 1초 공백도 없고 중복도 불가한 요구는 일반 K8s singleton 방식으로 해결하기 어려우며, DB lock·외부 코디네이터·전용 런타임·managed service·broker-native ordering·아키텍처 분리 같은 추가 제어가 필요하다.
+Kubernetes에서 `replica=1` singleton Pod 운영은 간단하지만 공백/중복 가능성을 제거하지 못한다. DB write 후 publish 순서는 타당해도 두 작업은 분리된 side effect라 장애 시 불일치가 생긴다. 실무적으로는 failover를 몇 초 허용할 수 있다면 replica 2~3, leader election, idempotent consumer, outbox pattern, graceful shutdown 조합이 권장된다. 반대로 1초 공백도 없고 중복도 불가한 요구는 일반 K8s singleton 방식만으로 해결하기 어렵고, DB lock·외부 코디네이터·전용 런타임·managed service·broker-native ordering·아키텍처 분리 같은 추가 제어가 필요하다.
