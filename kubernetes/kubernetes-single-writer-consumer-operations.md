@@ -23,7 +23,7 @@ Kubernetes의 목표는 워크로드 생존성과 수렴(convergence)입니다. 
 실무적으로 기억할 점은 두 가지입니다.
 
 1. **공백(window)**: 기존 Pod 종료와 신규 Pod 기동 사이에 소비 공백이 생길 수 있습니다.
-2. **중복(window)**: 종료 지연, readiness 전환 타이밍, 재시작/재할당 과정에서 짧은 중복 처리 가능성이 생길 수 있습니다.
+2. **중복(window)**: 종료 지연, 네트워크 지연, lease handoff 타이밍 때문에 짧은 중복 처리 구간이 생길 수 있습니다.
 
 그래서 singleton 요구사항은 오케스트레이터 설정만으로 끝내기보다, **애플리케이션/데이터 계층의 안전장치**까지 포함해 설계해야 합니다.
 
@@ -56,7 +56,7 @@ Kubernetes의 목표는 워크로드 생존성과 수렴(convergence)입니다. 
    - preStop/terminationGracePeriod 설정이 약하면 in-flight 처리 손실 위험
 
 3. **중복 처리 구간**
-   - 롤링 업데이트, 종료 지연, consumer group rebalance, readiness/lease handoff 타이밍이 겹칠 수 있음
+   - rolling update, readiness 전환, consumer group rebalance, leader handoff, ack 경계 타이밍이 겹칠 수 있음
    - 그 결과 동일 메시지 중복 소비/중복 write 가능
 
 4. **DB write / publish 불일치**
@@ -93,8 +93,10 @@ Kubernetes의 목표는 워크로드 생존성과 수렴(convergence)입니다. 
 DB 반영과 이벤트 발행을 느슨하게 연결해 불일치를 줄입니다.
 
 - 비즈니스 트랜잭션에서 도메인 변경 + outbox 레코드를 **같은 DB 트랜잭션**으로 저장
-- outbox relay(별도 프로세스 또는 같은 애플리케이션 내부의 분리된 워커)가 outbox를 읽어 broker로 publish
+- outbox relay가 outbox를 읽어 broker로 publish
 - publish 성공 시 outbox 상태 갱신
+
+outbox relay는 별도 프로세스일 수도 있고, 같은 애플리케이션 내부의 분리된 워커일 수도 있습니다.
 
 이렇게 하면 "DB만 성공하고 publish 누락" 문제를, 유실 위험을 재시도 가능한 지연 문제로 전환해 다룰 수 있습니다.
 
@@ -116,7 +118,7 @@ DB 반영과 이벤트 발행을 느슨하게 연결해 불일치를 줄입니�
 
 ## B안: "1초 공백도 안 되고, 중복도 절대 불가"일 때
 
-이 요구사항은 일반적인 K8s singleton Pod 패턴으로 풀기 어렵습니다. 사실상 매우 강한 failover 요구와 중복 불가 요구를 동시에 만족해야 하기 때문입니다.
+이 요구사항은 일반적인 K8s singleton Pod 패턴으로 풀기 어렵습니다. 사실상 매우 강한 failover 요구와 중복 불가 요구를 동시에 만족해야 하는 영역이기 때문입니다.
 
 현실적인 대안은 아래처럼 **제어 지점을 외부화/분리**하는 것입니다.
 
