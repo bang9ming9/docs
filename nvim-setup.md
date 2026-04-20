@@ -115,7 +115,7 @@ Neovim 0.12의 native API(`vim.lsp.config`, `vim.lsp.enable`) 기준으로 LSP�
 | `<leader>dc` | `:DiffviewClose` | **d**iff **c**lose | Normal |
 | `<leader>dh` | `DiffviewFileHistory %` | **d**iff file **h**istory | Normal |
 | `<leader>dH` | 프로젝트 전체 커밋 히스토리 | 대문자 **H**istory (전체 범위) | Normal |
-| `<leader>dm` | `:DiffviewOpen master` | **d**iff vs **m**aster | Normal |
+| `<leader>dm` | 기본 브랜치 비교 (`:DiffviewOpen main` 또는 `master`) | **d**iff vs default branch (**m**ain/**m**aster) | Normal |
 | `<leader>dB` | base/target 입력 비교 함수 (`base...target`) | **d**iff + custom **B**ranch compare | Normal |
 
 ### 마크다운
@@ -178,7 +178,8 @@ Neovim 0.12의 native API(`vim.lsp.config`, `vim.lsp.enable`) 기준으로 LSP�
 | `wildmode` | `longest:full,full` | Tab 자동완성 순환 방식 |
 | `showmode` | `true` | 현재 모드 표시 |
 | `laststatus` | `2` | 상태줄 항상 표시 |
-| `syntax` | `on` | 기본 syntax 하이라이트 fallback |
+
+> 참고: `syntax`는 `vim.opt` 테이블 항목이라기보다 Vim 명령(`:syntax on`) 성격에 가깝다. 이 설정에서는 Treesitter가 주 하이라이트를 담당하고, 기본 syntax는 fallback으로만 둔다.
 
 ## 첫 설치 가이드
 
@@ -200,7 +201,13 @@ Neovim에 진입한 뒤 다음 순서로 실행한다.
 :TSInstallInfo
 ```
 
-LSP 활성 확인(예: Go 파일 열기):
+LSP 상태 확인은 먼저 health 체크를 권장한다.
+
+```vim
+:checkhealth vim.lsp
+```
+
+필요하면 현재 버퍼에 attach된 서버를 추가로 확인한다.
 
 ```vim
 :LspInfo
