@@ -68,6 +68,21 @@ gruvbox 다크 테마와 기본 내장 기능(LSP/Treesitter)을 중심으로, �
 ### `sindrets/diffview.nvim`
 브랜치 간 비교, 커밋 히스토리 탐색, 프로젝트 범위 diff를 시각적으로 다룬다. 내 사용에서는 working tree 점검(`:DiffviewOpen`)과 브랜치 간 비교(`:DiffviewOpen main`/`master`, 또는 `base...target`)를 분리해서 본다. fugitive가 현재 작업 상태 확인의 진입점이라면, diffview는 브랜치 단위 변화처럼 큰 범위를 검토하는 뷰어 역할이다.
 
+### `iamcco/markdown-preview.nvim`
+마크다운 문서를 브라우저에서 즉시 렌더링해 확인한다. Mermaid까지 포함해 문서 결과물을 빠르게 검증할 수 있다. 코드 작성과 문서 미리보기를 Neovim 내부 키맵 하나로 왕복하는 용도로 사용한다.
+
+### `nvim-treesitter/nvim-treesitter`
+정확한 구문 인식 기반 하이라이트와 들여쓰기를 제공한다. Go/Lua/웹/문서/설정 파일군을 폭넓게 `ensure_installed`로 지정해 언어별 품질 편차를 줄였다. Vim 기본 `syntax`를 fallback으로 남겨 안정성도 같이 확보했다.
+
+### `williamboman/mason.nvim` + `williamboman/mason-lspconfig.nvim`
+LSP 서버 같은 외부 실행 파일 설치를 Neovim 내부에서 관리한다. 이 설정에서는 `gopls`, `lua_ls`를 자동 보장해 새 환경에서도 부트스트랩이 단순하다. mason-lspconfig를 연결점으로 사용해 설치 상태와 LSP 활성화를 자연스럽게 이어준다.
+
+### `neovim/nvim-lspconfig`
+Neovim 0.12의 native API(`vim.lsp.config`, `vim.lsp.enable`) 기준으로 LSP를 구성했다. `gopls`에는 `staticcheck`, `gofumpt`, `unusedparams` 분석을 켜고, `lua_ls`에는 `vim` 글로벌/서드파티 검사 설정을 반영했다. 키맵은 `LspAttach`에서 버퍼 로컬로 묶어 과도한 전역 충돌을 피했다.
+
+### `nvim-telescope/telescope.nvim`
+파일 찾기, live grep, 버퍼/헬프/심볼/진단 조회를 통합한 검색 UI다. `prompt_position=top`, `sorting_strategy=ascending`, `path_display=truncate`로 결과 읽기 흐름을 단순화했다. neo-tree가 계층 탐색 도구라면 telescope는 질의 기반 탐색 도구다.
+
 ## Git 확인 흐름 (현재 설정 기준)
 
 플러그인 이름보다 “변경 범위” 기준으로 도구를 고른다.
@@ -94,21 +109,6 @@ gruvbox 다크 테마와 기본 내장 기능(LSP/Treesitter)을 중심으로, �
    - diffview의 파일 목록 패널에서 변경 파일을 이동하며 전체를 훑고, 변경량이 큰 파일은 상세 diff 창에서 집중해서 확인한다.
 
 요약하면, 현재 내 설정에서는 작은 범위는 gitsigns, 작업셋 기준 탐색은 fugitive status, 브랜치/히스토리 같은 큰 범위는 diffview로 나눠 쓴다. 작은 변경 확인과 큰 범위 비교를 분리하면 화면 전환 부담이 줄고, split/tab을 유지한 상태에서 검토 순서를 이어가기 쉽다.
-
-### `iamcco/markdown-preview.nvim`
-마크다운 문서를 브라우저에서 즉시 렌더링해 확인한다. Mermaid까지 포함해 문서 결과물을 빠르게 검증할 수 있다. 코드 작성과 문서 미리보기를 Neovim 내부 키맵 하나로 왕복하는 용도로 사용한다.
-
-### `nvim-treesitter/nvim-treesitter`
-정확한 구문 인식 기반 하이라이트와 들여쓰기를 제공한다. Go/Lua/웹/문서/설정 파일군을 폭넓게 `ensure_installed`로 지정해 언어별 품질 편차를 줄였다. Vim 기본 `syntax`를 fallback으로 남겨 안정성도 같이 확보했다.
-
-### `williamboman/mason.nvim` + `williamboman/mason-lspconfig.nvim`
-LSP 서버 같은 외부 실행 파일 설치를 Neovim 내부에서 관리한다. 이 설정에서는 `gopls`, `lua_ls`를 자동 보장해 새 환경에서도 부트스트랩이 단순하다. mason-lspconfig를 연결점으로 사용해 설치 상태와 LSP 활성화를 자연스럽게 이어준다.
-
-### `neovim/nvim-lspconfig`
-Neovim 0.12의 native API(`vim.lsp.config`, `vim.lsp.enable`) 기준으로 LSP를 구성했다. `gopls`에는 `staticcheck`, `gofumpt`, `unusedparams` 분석을 켜고, `lua_ls`에는 `vim` 글로벌/서드파티 검사 설정을 반영했다. 키맵은 `LspAttach`에서 버퍼 로컬로 묶어 과도한 전역 충돌을 피했다.
-
-### `nvim-telescope/telescope.nvim`
-파일 찾기, live grep, 버퍼/헬프/심볼/진단 조회를 통합한 검색 UI다. `prompt_position=top`, `sorting_strategy=ascending`, `path_display=truncate`로 결과 읽기 흐름을 단순화했다. neo-tree가 계층 탐색 도구라면 telescope는 질의 기반 탐색 도구다.
 
 ## 선택/복사 흐름 (현재 설정 기준)
 
