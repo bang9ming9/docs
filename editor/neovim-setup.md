@@ -83,8 +83,6 @@ Neovim 0.12의 native API(`vim.lsp.config`, `vim.lsp.enable`) 기준으로 LSP�
 ### `nvim-telescope/telescope.nvim`
 파일 찾기, live grep, 버퍼/헬프/심볼/진단 조회를 통합한 검색 UI다. `prompt_position=top`, `sorting_strategy=ascending`, `path_display=truncate`로 결과 읽기 흐름을 단순화했다. neo-tree가 계층 탐색 도구라면 telescope는 질의 기반 탐색 도구다.
 
-여기까지는 플러그인별 상세 설명이고, 아래부터는 실제 작업 시 자주 쓰는 흐름을 정리한다.
-
 ## Git 확인 흐름 (현재 설정 기준)
 
 플러그인 이름보다 “변경 범위” 기준으로 도구를 고른다.
