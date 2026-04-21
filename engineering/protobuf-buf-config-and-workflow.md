@@ -24,7 +24,7 @@ Protobuf를 처음 도입할 때는 `protoc` 명령을 직접 호출해도 큰 �
 
 ### 1) `buf.yaml`이 담당하는 것
 
-`buf.yaml`은 Protobuf 모듈 단위에서 스키마 정책을 다루는 설정이다. 보통 다음 책임이 들어간다.
+`buf.yaml`은 workspace에서 공통으로 적용할 스키마 관리 기준을 정의하는 설정이며, 그 안에 하나 이상의 module 구성을 함께 담을 수 있다. 보통 다음 책임이 들어간다.
 
 - module/workspace 관점의 기준점
 - lint 규칙
@@ -48,6 +48,8 @@ breaking:
 deps:
   - buf.build/acme/common
 ```
+
+위 예시에서 `deps`는 BSR 기준 모듈 의존성을 가리킨다. 로컬 경로나 일반 Git URL을 그대로 넣는 용도로 이해하기보다, 스키마 모듈 의존성 선언으로 보는 편이 안전하다.
 
 위 예시의 핵심은 구문 자체보다 책임 범위다. lint/breaking/dependency는 생성 대상 언어(Go, Java, TS 등)와 무관하게, 스키마 운영 규칙에 속한다.
 
@@ -87,8 +89,8 @@ plugins:
 
 - include path가 서비스별 스크립트에 분산됨
 - plugin 옵션이 언어/팀별로 조금씩 달라짐
-- 실행 위치(working directory) 의존성이 생겨 CI와 로컬 결과가 달라짐
-- 생성 대상 경로 규칙이 통일되지 않아 diff가 잦아짐
+- 실행 위치(working directory) 의존성 때문에 CI와 로컬 결과 차이가 생기기 쉬움
+- 생성 대상 경로 규칙이 팀별 스크립트 운영 방식에 따라 달라져 diff가 잦아질 수 있음
 - lint/breaking 검사가 생성 과정과 분리되어 운영됨
 
 ### 일반적인 해석
