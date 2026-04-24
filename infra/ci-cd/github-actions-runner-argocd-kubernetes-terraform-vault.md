@@ -71,10 +71,10 @@ GitHub Actions는 저장소 이벤트를 기준으로 workflow를 실행하는 �
 
 **실행은 runner가 담당**합니다. Runner는 GitHub Actions job을 실제로 수행하는 머신/환경(예: VM, 컨테이너 호스트)입니다.
 
-- GitHub-hosted runner
+- **GitHub-hosted runner**
   - 운영 부담이 낮고 빠르게 시작하기 쉬움
   - 인터넷 기반 의존성 위주 파이프라인에 적합한 경우가 많음
-- Self-hosted runner
+- **Self-hosted runner**
   - 내부망·사내 레지스트리·사내 인증 체계 접근이 필요할 때 선택되는 경우가 많음
   - 커스텀 빌드 도구/보안 에이전트가 필요한 환경에 유리할 수 있음
 
@@ -159,7 +159,7 @@ Vault는 토큰, DB 비밀번호, API 키, 인증서 같은 민감 정보를 안
 - 서비스/환경별 접근 정책 분리
 - 감사 로그와 회전(rotate) 정책 운영
 
-GitHub Actions Secrets, Vault, Kubernetes Secret은 서로 대체 관계라기보다 역할이 겹치는 일부 구간을 가진 구성 요소입니다. 어떤 저장소/주입 경로를 쓸지는 보안 정책과 운영 편의성에 따라 달라질 수 있습니다.
+GitHub Actions Secrets, Vault, Kubernetes Secret은 서로 대체 관계라기보다 역할이 겹치는 일부 구간을 가진 구성 요소입니다. 어떤 저장소/주입 경로를 쓸지는 보안 정책과 운영 편의성에 따라 달라질 수 있습니다. Vault 값을 워크로드에 전달하는 방식도 Vault Agent, External Secrets Operator, CSI Driver, 애플리케이션 직접 조회 등 조직 구성에 따라 달라질 수 있습니다.
 
 ---
 
@@ -180,11 +180,11 @@ GitHub Actions Secrets, Vault, Kubernetes Secret은 서로 대체 관계라기�
 
 실무에서 자주 보이는 패턴은 아래 두 가지입니다.
 
-1. **GitOps 중심 방식**
-   - Actions가 이미지 빌드/푸시 후 배포 설정(image tag 등)을 Git에 반영
-   - Argo CD가 Git 변경을 감지해 동기화
-2. **동기화 트리거 방식**
-   - 필요 시 Actions가 Argo CD CLI/API를 통해 동기화를 요청
+- **GitOps 중심 방식**
+  - Actions가 이미지 빌드/푸시 후 배포 설정(image tag 등)을 Git에 반영
+  - Argo CD가 Git 변경을 감지해 동기화
+- **동기화 트리거 방식**
+  - 필요 시 Actions가 Argo CD CLI/API를 통해 동기화를 요청
 
 어떤 방식을 선택할지는 배포 승인 모델, 감사 추적 요구, 운영 자동화 수준에 따라 달라질 수 있습니다. 한 방식만 정답이라고 보기는 어렵습니다.
 
@@ -233,7 +233,7 @@ flowchart TB
     A --> B --> C --> D --> E
     F -. 기반 환경 제공 .-> E
     F -. Vault 구성/정책 .-> G
-    G -. 시크릿 주입/조회 .-> E
+    G -. 시크릿 참조/연동 .-> E
 ```
 
 ---
