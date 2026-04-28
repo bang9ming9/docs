@@ -1,4 +1,5 @@
 # Neovim 사용 흐름 메모
+
 이 문서는 [`neovim-setup.md`](./neovim-setup.md) 구성 위에서, 실제 작업 때 반복해서 쓰는 조작 흐름만 정리한 기록이다.
 
 설정값과 플러그인 구성은 setup 문서에서 확인하고, 여기서는 “언제 어떤 흐름을 고르는지”를 중심으로 본다.
@@ -77,7 +78,8 @@ Insert 모드에서는 `nvim-cmp`를 기본 인터페이스로 쓴다. 가장 �
 - `V`: 줄 단위
 - `<C-v>`: 블록(직사각형)
 
-기본 패턴은 `v`/`V`/`<C-v>` 진입 → 이동 키(`h`,`j`,`k`,`l`, `w`, `f` 등)로 범위 조정 → `y`(또는 `"+y`)다.
+기본 패턴은 `v` / `V` / `<C-v>` 진입 → 이동 키 (`h`, `j`, `k`, `l`, `w`, `f` 등)로 범위 조정 → `y` (또는
+`"+y`)다.
 
 ### yank와 시스템 클립보드 복사
 
@@ -114,7 +116,8 @@ Insert 모드에서는 `nvim-cmp`를 기본 인터페이스로 쓴다. 가장 �
 
 ## Treesitter textobjects 사용 흐름
 
-`nvim-treesitter-textobjects`는 함수/인자/구조체 같은 단위를 직접 잡아서 편집할 때 사용한다. 긴 코드에서 범위를 수동으로 맞추는 시간을 줄이는 데 목적이 있다.
+`nvim-treesitter-textobjects`는 함수/인자/구조체 같은 단위를 직접 잡아서 편집할 때 사용한다. 긴 코드에서 범위를 수동으로 맞추는 시간을
+줄이는 데 목적이 있다.
 
 ### 언제 쓰는가
 
@@ -136,13 +139,13 @@ Insert 모드에서는 `nvim-cmp`를 기본 인터페이스로 쓴다. 가장 �
 ### 파일 탐색기
 
 | 키 | 동작 | 모드 |
-|---|---|---|
+| --- | --- | --- |
 | `<C-n>` | Neo-tree 토글 | Normal |
 
 ### Git
 
 | 키 | 동작 | 모드 |
-|---|---|---|
+| --- | --- | --- |
 | `]h` / `[h` | 다음/이전 hunk | Normal |
 | `<leader>hp` | hunk 미리보기 | Normal |
 | `<leader>hb` | 현재 줄 blame | Normal |
@@ -161,7 +164,7 @@ Insert 모드에서는 `nvim-cmp`를 기본 인터페이스로 쓴다. 가장 �
 ### 자동완성 (`nvim-cmp`)
 
 | 키 | 동작 | 모드 |
-|---|---|---|
+| --- | --- | --- |
 | `<C-n>` / `<C-p>` | 다음/이전 후보 선택 | Insert |
 | `<CR>` | 후보 확정 | Insert |
 | `<C-Space>` | completion 팝업 수동 호출 | Insert |
@@ -171,7 +174,7 @@ Insert 모드에서는 `nvim-cmp`를 기본 인터페이스로 쓴다. 가장 �
 ### Treesitter textobjects
 
 | 키 | 동작 | 모드 |
-|---|---|---|
+| --- | --- | --- |
 | `af` / `if` | 함수 outer/inner 선택 | Operator-pending, Visual |
 | `ac` / `ic` | struct/interface/class outer/inner 선택 | Operator-pending, Visual |
 | `aa` / `ia` | 인자 outer/inner 선택 | Operator-pending, Visual |
@@ -182,22 +185,22 @@ Insert 모드에서는 `nvim-cmp`를 기본 인터페이스로 쓴다. 가장 �
 ### 클립보드 복사 (`"+` 레지스터)
 
 | 키 | 동작 | 모드 |
-|---|---|---|
+| --- | --- | --- |
 | `"+yiw` | 단어를 시스템 클립보드로 복사 | Normal |
 | `"+yy` | 현재 줄을 시스템 클립보드로 복사 | Normal |
 | Visual 선택 후 `"+y` | 선택 영역을 시스템 클립보드로 복사 | Visual |
-| blockwise Visual(`<C-v>`) 후 `"+y` | 직사각형 블록을 시스템 클립보드로 복사 | Visual Block |
+| blockwise Visual (`<C-v>`) 후 `"+y` | 직사각형 블록을 시스템 클립보드로 복사 | Visual Block |
 
 ### 마크다운
 
 | 키 | 동작 | 모드 |
-|---|---|---|
+| --- | --- | --- |
 | `<leader>mp` | `:MarkdownPreviewToggle` | Normal |
 
 ### Telescope
 
 | 키 | 동작 | 모드 |
-|---|---|---|
+| --- | --- | --- |
 | `<leader>ff` | 파일 퍼지 검색 | Normal |
 | `<leader>fg` | 프로젝트 전체 live grep | Normal |
 | `<leader>fb` | 버퍼 목록 | Normal |
@@ -213,7 +216,7 @@ Insert 모드에서는 `nvim-cmp`를 기본 인터페이스로 쓴다. 가장 �
 정의/참조로 이동한 뒤에는 `<C-o>` / `<C-i>`를 브라우저의 뒤로/앞으로 가기처럼 써서 원래 편집 위치를 빠르게 왕복한다.
 
 | 키 | 동작 | 모드 |
-|---|---|---|
+| --- | --- | --- |
 | `gd` / `gD` / `gr` / `gi` | 정의/선언/참조/구현 이동 | Normal |
 | `<C-o>` / `<C-i>` | 점프 이전/다음 위치로 이동 (`gd`/`gr` 뒤로 가기·앞으로 가기) | Normal |
 | `K` | hover 문서 | Normal |
