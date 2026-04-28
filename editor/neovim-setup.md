@@ -2,7 +2,8 @@
 
 이 설정은 Go 개발을 중심으로, 필요한 플러그인만 얇게 조합해 유지하는 현재 Neovim 구성 기록이다.
 
-gruvbox 다크 테마와 기본 내장 기능(LSP/Treesitter)을 축으로 두고, 문서 내 키 표기는 `<leader>` = `\\`(백슬래시) 기준으로 통일한다.
+gruvbox 다크 테마와 기본 내장 기능(LSP/Treesitter)을 축으로 두고, 문서 내 키 표기는 `<leader>` = `\\`(백슬래시) 기준으로
+통일한다.
 
 > 실제 사용 순서와 조작 메모는 [`neovim-workflows.md`](./neovim-workflows.md)에서 따로 관리한다.
 
@@ -58,19 +59,23 @@ gruvbox 다크 테마와 기본 내장 기능(LSP/Treesitter)을 축으로 두�
 ## 플러그인별 상세 설명
 
 ### `folke/lazy.nvim`
-플러그인 설치/업데이트/락파일 관리를 맡는 기반 계층이다. 이 설정은 키/이벤트/명령 조건으로 로딩 시점을 분리해, 시작 비용과 기능 확장 시 복잡도를 함께 관리한다.
+플러그인 설치/업데이트/락파일 관리를 맡는 기반 계층이다. 이 설정은 키/이벤트/명령 조건으로 로딩 시점을 분리해, 시작 비용과 기능 확장 시 복잡도를 함께
+관리한다.
 
 ### `ellisonleao/gruvbox.nvim`
-전체 UI 기준 테마다. `priority=1000`으로 먼저 로드해 하이라이트 기준을 고정하고, `background=dark`로 터미널/GUI 간 색감 편차를 줄인다.
+전체 UI 기준 테마다. `priority=1000`으로 먼저 로드해 하이라이트 기준을 고정하고, `background=dark`로 터미널/GUI 간 색감 편차를
+줄인다.
 
 ### `nvim-neo-tree/neo-tree.nvim` (+ `plenary.nvim`, `nvim-web-devicons`, `nui.nvim`)
-사이드바 파일 트리를 제공한다. `follow_current_file`를 켜서 현재 버퍼와 트리 위치를 맞추고, 파일 오픈 시 트리를 닫는 옵션으로 편집 영역을 확보한다.
+사이드바 파일 트리를 제공한다. `follow_current_file`를 켜서 현재 버퍼와 트리 위치를 맞추고, 파일 오픈 시 트리를 닫는 옵션으로 편집 영역을
+확보한다.
 
 ### `lewis6991/gitsigns.nvim`
 버퍼 내 Git hunk 표시와 hunk 단위 preview/blame/diff 명령을 제공한다. 파일 내부 변경을 줄 단위로 점검할 때 기준이 되는 구성 요소다.
 
 ### `tpope/vim-fugitive`
-`:Git` 중심의 status/blame/log/diff 인터페이스를 제공한다. 프로젝트 상태 확인과 파일 단위 Git 조회를 Neovim 내부에서 일관된 명령 체계로 처리한다.
+`:Git` 중심의 status/blame/log/diff 인터페이스를 제공한다. 프로젝트 상태 확인과 파일 단위 Git 조회를 Neovim 내부에서 일관된 명령
+체계로 처리한다.
 
 ### `sindrets/diffview.nvim`
 프로젝트 단위 diff 및 히스토리 뷰를 패널 UI로 제공한다. working tree 비교와 브랜치 범위 비교를 같은 도구로 다룰 수 있게 구성했다.
@@ -82,16 +87,21 @@ gruvbox 다크 테마와 기본 내장 기능(LSP/Treesitter)을 축으로 두�
 Treesitter는 구문 기반 하이라이트/들여쓰기 정확도를 담당하고, textobjects는 같은 구문 트리를 함수·인자·클래스 단위 선택/조작에 재사용한다.
 
 ### `williamboman/mason.nvim` + `williamboman/mason-lspconfig.nvim` + `WhoIsSethDaniel/mason-tool-installer.nvim`
-mason은 외부 실행 파일 설치를 맡고, mason-lspconfig는 LSP 서버 보장 설치와 연결을 담당한다. mason-tool-installer는 LSP 외 도구를 같은 방식으로 관리해 환경 재현성을 맞춘다.
+mason은 외부 실행 파일 설치를 맡고, mason-lspconfig는 LSP 서버 보장 설치와 연결을 담당한다. mason-tool-installer는 LSP 외
+도구를 같은 방식으로 관리해 환경 재현성을 맞춘다.
 
 ### `neovim/nvim-lspconfig`
-Neovim 0.12의 native API(`vim.lsp.config`, `vim.lsp.enable`) 기준으로 LSP를 구성했다. `gopls`의 `staticcheck`, `gofumpt`, `unusedparams` 분석을 켜고, `lua_ls`는 `vim` 글로벌/서드파티 검사 설정을 반영했다. 키맵은 `LspAttach`에서 버퍼 로컬로 등록한다.
+Neovim 0.12의 native API(`vim.lsp.config`, `vim.lsp.enable`) 기준으로 LSP를 구성했다. `gopls`의
+`staticcheck`, `gofumpt`, `unusedparams` 분석을 켜고, `lua_ls`는 `vim` 글로벌/서드파티 검사 설정을 반영했다. 키맵은
+`LspAttach`에서 버퍼 로컬로 등록한다.
 
 ### `hrsh7th/nvim-cmp` + completion source(`cmp-*`) + `LuaSnip`
-`nvim-cmp`가 자동완성 UI/선택/확정을 담당하고 source 플러그인이 후보를 공급한다. 현재 구성은 LSP, 버퍼, 경로, 명령행, 스니펫 source를 함께 연결해 Insert 모드 입력 경로를 단일 인터페이스로 맞춘다.
+`nvim-cmp`가 자동완성 UI/선택/확정을 담당하고 source 플러그인이 후보를 공급한다. 현재 구성은 LSP, 버퍼, 경로, 명령행, 스니펫 source를
+함께 연결해 Insert 모드 입력 경로를 단일 인터페이스로 맞춘다.
 
 ### `nvim-telescope/telescope.nvim`
-파일/grep/버퍼/심볼/진단 조회를 통합한 질의형 검색 UI다. `prompt_position=top`, `sorting_strategy=ascending`, `path_display=truncate`를 기본값으로 사용한다.
+파일/grep/버퍼/심볼/진단 조회를 통합한 질의형 검색 UI다. `prompt_position=top`, `sorting_strategy=ascending`,
+`path_display=truncate`를 기본값으로 사용한다.
 
 ## Mason 관리 외부 바이너리
 
