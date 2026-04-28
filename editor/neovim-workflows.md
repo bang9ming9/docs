@@ -6,8 +6,10 @@
 ## 목차
 
 - [Git 변경을 확인할 때의 흐름](#git-변경을-확인할-때의-흐름)
+- [자동완성(cmp) 사용 흐름](#자동완성cmp-사용-흐름)
 - [선택/복사할 때의 흐름](#선택복사할-때의-흐름)
-- [함수 시그니처를 복사할 때의 흐름](#함수-시그니처를-복사할-때의-흐름)
+- [함수/시그니처 복사 흐름](#함수시그니처-복사-흐름)
+- [Treesitter textobjects 사용 흐름](#treesitter-textobjects-사용-흐름)
 - [단축키 빠른 정리](#단축키-빠른-정리)
 
 ## Git 변경을 확인할 때의 흐름
@@ -24,18 +26,51 @@
    - status 창에서 변경 파일 목록을 커서로 이동하며 확인한다.
    - 파일 위에서 Enter로 열어 내용/맥락을 먼저 훑는다.
    - 비교가 필요하면 일반 Vim 방식으로 horizontal split / vertical split / tab에 열어 컨텍스트를 유지한 채 본다.
-   - 파일을 빠르게 확인한 뒤에는 이전 창으로 돌아오거나 status 창으로 다시 이동해 다음 파일을 선택한다.
-   - staged/worktree 기준으로 더 깊은 비교가 필요할 때만 `:Gvdiffsplit` 같은 별도 diff 명령 흐름으로 들어간다.
-   - 이렇게 status를 기준점으로 두면 “이번 작업셋에서 아직 확인 안 한 파일”을 놓치지 않기 쉽다.
+   - staged/worktree 기준으로 더 깊은 비교가 필요할 때만 `:Gvdiffsplit` 흐름으로 들어간다.
 
 3. **브랜치 단위/큰 범위 비교 — `diffview.nvim`**
    - 작업 중인 변경(working tree)을 프로젝트 단위로 볼 때는 `:DiffviewOpen`을 쓴다.
-   - 현재 브랜치를 `main`/`master`와 비교할 때는 `:DiffviewOpen main...HEAD`(또는 `master...HEAD`)처럼 기준점을 명시해 연다.
+   - 현재 로컬 설정 기준 `<leader>dm`은 `main` 비교용으로 고정해서 사용한다(`:DiffviewOpen main...HEAD`).
    - 특정 브랜치끼리는 `:DiffviewOpen base...target` 형태로 연다.
-   - 여기서 핵심은 **working tree diff**(내 작업 디렉터리 변화)와 **branch diff**(두 기준점 사이 변화)를 분리해서 이해하는 것이다.
-   - diffview의 파일 목록 패널에서 변경 파일을 이동하며 전체를 훑고, 변경량이 큰 파일은 상세 diff 창에서 집중해서 확인한다.
+   - 핵심은 **working tree diff**와 **branch diff**를 분리해 보는 것이다.
 
-요약하면, 현재 내 흐름에서는 작은 범위는 gitsigns, 작업셋 기준 탐색은 fugitive status, 브랜치/히스토리 같은 큰 범위는 diffview로 나눠 쓴다.
+요약하면, 작은 범위는 gitsigns, 작업셋 기준 탐색은 fugitive status, 브랜치/히스토리 같은 큰 범위는 diffview로 나눠 쓴다.
+
+## 자동완성(cmp) 사용 흐름
+
+Insert 모드 입력 중에는 `nvim-cmp`를 기본 인터페이스로 사용한다. 실제로는 “후보 이동 → 문서 확인 → 확정”을 짧게 반복하는 패턴이 가장 많다.
+
+### 기본 조작 패턴
+
+- 자동으로 뜬 목록에서 `<C-n>`/`<C-p>`로 후보 이동
+- 현재 후보 확정은 `<CR>`
+- 팝업이 닫혀 있으면 `<C-Space>`로 수동 호출
+- 목록을 닫고 원문 입력으로 돌아갈 때는 `<C-e>`
+- 후보 문서 창은 `<C-f>`/`<C-b>`로 스크롤
+
+### 후보 출처를 읽는 방식
+
+후보 끝 라벨을 빠르게 보고 출처를 판단한다.
+
+- `[LSP]`: 언어 서버가 제공한 타입/메서드/심볼 후보
+- `[Snippet]`: LuaSnip 기반 스니펫 후보
+- `[Buffer]`: 현재(또는 열린) 버퍼 텍스트 후보
+- `[Path]`: 파일 경로 후보
+
+### 자주 쓰는 실무 패턴
+
+1. **메서드 후보 확인**
+   - `obj.` 입력 후 `[LSP]` 후보를 훑어 타입에 맞는 메서드를 확정한다.
+2. **import 자동 보강**
+   - 심볼 이름 일부 입력 → `[LSP]` 후보 확정 → LSP code action/organize imports 흐름으로 정리한다.
+3. **snippet 확장**
+   - 반복 패턴 입력 시 `[Snippet]` 후보를 먼저 확정해 구조를 만든 뒤 본문만 채운다.
+
+### 간단한 트러블슈팅
+
+- 팝업이 전혀 뜨지 않으면: 현재 버퍼에 LSP가 붙었는지 `:LspInfo` 먼저 확인
+- LSP 후보만 비어 있으면: `:Mason`에서 해당 서버 설치 여부 확인
+- 전체 상태 점검이 필요하면: `:checkhealth lsp` 확인
 
 ## 선택/복사할 때의 흐름
 
@@ -43,148 +78,140 @@ Git 확인 흐름으로 변경 범위를 정리한 다음, 필요한 코드 조�
 
 ### Visual mode로 영역 선택
 
-- `v`: 문자 단위 선택. 커서를 움직이며 일반 영역을 잡을 때 쓴다.
-- `V`: 줄 단위 선택. 코드 블록이나 로그처럼 “줄 단위로 통째로” 가져갈 때 쓴다.
-- `<C-v>`: 블록(직사각형) 선택. 여러 줄의 같은 열만 잘라서 복사할 때 쓴다.
+- `v`: 문자 단위 선택
+- `V`: 줄 단위 선택
+- `<C-v>`: 블록(직사각형) 선택
 
-마우스 드래그 대신 키보드로 영역을 잡는 기본 패턴은 `v`/`V`/`<C-v>`로 진입 → 이동 키(`h`,`j`,`k`,`l`, `w`, `f` 등)로 범위 조정 → `y`(또는 `"+y`)로 복사다.
+기본 패턴은 `v`/`V`/`<C-v>` 진입 → 이동 키(`h`,`j`,`k`,`l`, `w`, `f` 등)로 범위 조정 → `y`(또는 `"+y`) 복사다.
 
 ### yank와 시스템 클립보드 복사
 
-- `y`는 delete가 아니라 **yank(복사)** 다. 기본적으로 Vim 레지스터로 들어간다.
-- 시스템 클립보드로 바로 복사할 때는 `"+` 레지스터를 붙여 `"+y` 형태를 쓴다.
-- Visual 선택 후 `"+y`를 누르면 선택 영역이 시스템 클립보드로 복사된다.
+- `y`는 Vim 레지스터 복사
+- 시스템 클립보드는 `"+` 레지스터 사용 (`"+y`)
 
 자주 쓰는 최소 패턴:
 
-- 단어 복사: `"+yiw` (`iw` = 현재 단어 text object)
+- 단어 복사: `"+yiw`
 - 현재 줄 복사: `"+yy`
-- 선택 영역 복사: `v` 또는 `V`로 선택 후 `"+y`
-- 직사각형 블록 복사: `<C-v>`로 블록 선택 후 `"+y`
+- 선택 영역 복사: `v` 또는 `V` 후 `"+y`
+- 직사각형 복사: `<C-v>` 후 `"+y`
 
-> 참고: `"+` 클립보드 레지스터 동작은 환경의 clipboard provider(예: macOS `pbcopy`)가 잡혀 있어야 한다. provider가 없는 환경에서는 기본 `y`로 내부 레지스터 복사만 동작할 수 있다.
+> 참고: `"+` 레지스터는 OS clipboard provider가 있어야 동작한다.
 
-## 함수 시그니처를 복사할 때의 흐름
+## 함수/시그니처 복사 흐름
 
-함수 선언 전체가 아니라 필요한 조각만 빠르게 가져갈 때 아래 흐름을 반복해서 쓴다. (예: 리뷰 코멘트에 함수 이름만 붙이거나, 인자 목록만 별도 공유)
+기본 Vim 모션 흐름은 여전히 유효하고, 반복되는 구조 편집에서는 Treesitter textobjects 흐름이 더 빠를 때가 많다.
 
-### 1) 한 줄 선언에서 `aaa()`만 복사
+### 1) 기본 모션으로 빠르게 복사 (기존 패턴 유지)
 
-예시:
+- 한 줄 선언에서 `aaa()`만 복사: 함수 이름 첫 글자에서 `yf)` 또는 `"+yf)`
+- 여러 줄 선언에서 이름부터 `)`까지: `v` → `f(` → `%` → `"+y`
+- 괄호 안 인자만 / 괄호 포함 전체: `yi(` / `ya(` (`"+yi(`, `"+ya(`)
 
-```go
-func aaa() {
-```
+### 2) textobjects로 구조 단위 복사 (현재 설정에서 더 자주 사용)
 
-```solidity
-function aaa() {
-```
+- 함수 안 어디서든 함수 전체 복사: `yaf`
+- 함수 본문(내부)만 복사: `yif`
+- 인자 하나만 복사: `yaa` 또는 `yia`
+- 인자 하나 삭제/교체 시작: `daa` 또는 `cia`
 
-- 함수 이름 첫 글자(`a`)에 커서를 둔다.
-- `yf)`를 쓰면 커서부터 `)`까지 yank한다(즉 `aaa()`까지).
-- 시스템 클립보드가 필요하면 `"+yf)`를 같은 방식으로 쓴다.
+코드가 길어질수록 `f(`, `%`로 범위를 수동 조정하기보다, `af/if/aa/ia`처럼 구문 단위를 직접 선택하는 편이 재현성이 높다.
 
-여기서는 `func`/`function`/`{`를 제외하고 함수 호출 형태만 빠르게 가져오는 용도로 쓴다.
+## Treesitter textobjects 사용 흐름
 
-### 2) 여러 줄 시그니처에서 함수 이름부터 마지막 `)`까지 복사
+`nvim-treesitter-textobjects`를 켜 둔 뒤에는 함수/인자/구조체 단위 편집을 “커서 주변 구조 기준”으로 처리한다.
 
-예시:
+### 언제 쓰는가
 
-```solidity
-function aaa(
-  uint256 a,
-  uint256 b
-)
-```
+- 함수 전체를 통째로 리뷰 코멘트에 붙일 때: `vaf` 또는 `yaf`
+- 함수 본문만 가져오고 선언부는 뺄 때: `vif` 또는 `yif`
+- 긴 파라미터 목록에서 한 인자만 수정/삭제할 때: `cia`, `daa`
+- Go struct/interface 블록을 통째로 옮길 때: `vac` 또는 `yac`
 
-여러 줄일 때는 한 번에 정확히 잡기보다, Visual 선택 + 괄호 매칭 이동을 조합하는 편이 실수율이 낮다.
+### 선택/이동 최소 세트
 
-- 함수 이름 첫 글자(`a`)에서 `v`로 선택 시작
-- `f(`로 여는 괄호 `(`까지 이동한 뒤 `%`로 대응되는 닫는 괄호 `)`로 점프
-- 필요한 범위가 맞는지 확인 후 `"+y`
+- 함수: `af`(outer), `if`(inner)
+- 클래스/struct/interface 블록: `ac`(outer), `ic`(inner)
+- 인자: `aa`(outer), `ia`(inner)
+- 이동(설정된 경우): 다음/이전 함수, 다음/이전 인자 이동 키
 
-코드 형태가 매번 같지 않아서, 이 흐름은 “함수 이름부터 닫는 괄호까지”를 눈으로 확인하면서 보수적으로 복사할 때 쓴다.
-
-### 3) 괄호 안 인자만 / 괄호 포함 전체 복사
-
-괄호 text object를 쓰면 인자만 따로 가져오기 쉽다.
-
-- 괄호 안 인자만: `yi(` 또는 `yi)`
-- 괄호 포함 전체: `ya(` 또는 `ya)`
-- 시스템 클립보드로 바로 복사: `"+yi(`, `"+ya(`
-
-함수 선언이 한 줄이든 여러 줄이든, 커서가 해당 괄호 쌍 내부(또는 경계) 문맥에 있으면 같은 패턴으로 재사용할 수 있다.
+> 이동 키 조합은 설정 파일 기준으로 다를 수 있어, 이 문서에서는 “다음/이전 함수·인자 이동이 가능하다”는 사용 흐름만 유지한다.
 
 ## 단축키 빠른 정리
 
 ### 파일 탐색기
 
-| 키 | 동작 | 어원(mnemonic) | 모드 |
-|---|---|---|---|
-| `<C-n>` | Neo-tree 토글 | **n**avigation tree | Normal |
+| 키 | 동작 | 모드 |
+|---|---|---|
+| `<C-n>` | Neo-tree 토글 | Normal |
 
-### Git — gitsigns (hunk 단위)
+### Git
 
-| 키 | 동작 | 어원(mnemonic) | 모드 |
-|---|---|---|---|
-| `]h` | 다음 hunk | 다음 블록으로 이동 | Normal |
-| `[h` | 이전 hunk | 이전 블록으로 이동 | Normal |
-| `<leader>hp` | hunk 미리보기 | **h**unk **p**review | Normal |
-| `<leader>hb` | 현재 줄 full blame | **h**unk/**line** **b**lame | Normal |
-| `<leader>hd` | 현재 파일 diff(index 대비) | **h**unk/file **d**iff | Normal |
+| 키 | 동작 | 모드 |
+|---|---|---|
+| `]h` / `[h` | 다음/이전 hunk | Normal |
+| `<leader>hp` | hunk 미리보기 | Normal |
+| `<leader>hb` | 현재 줄 blame | Normal |
+| `<leader>hd` | 현재 파일 diff(index 대비) | Normal |
+| `<leader>gs` | `:Git` status | Normal |
+| `<leader>gd` | `:Gvdiffsplit` | Normal |
+| `<leader>gb` | `:Git blame` | Normal |
+| `<leader>gl` | `:Git log --oneline` | Normal |
+| `<leader>do` | `:DiffviewOpen` (working tree) | Normal |
+| `<leader>dc` | `:DiffviewClose` | Normal |
+| `<leader>dh` | `DiffviewFileHistory %` | Normal |
+| `<leader>dH` | 프로젝트 전체 커밋 히스토리 | Normal |
+| `<leader>dm` | `:DiffviewOpen main...HEAD` | Normal |
+| `<leader>dB` | `base...target` 비교 입력 | Normal |
 
-### Git — fugitive (명령 통합)
+### 자동완성 (`nvim-cmp`)
 
-| 키 | 동작 | 어원(mnemonic) | 모드 |
-|---|---|---|---|
-| `<leader>gs` | `:Git` status | **g**it **s**tatus | Normal |
-| `<leader>gd` | `:Gvdiffsplit` | **g**it **d**iff | Normal |
-| `<leader>gb` | `:Git blame` | **g**it **b**lame | Normal |
-| `<leader>gl` | `:Git log --oneline` | **g**it **l**og | Normal |
+| 키 | 동작 | 모드 |
+|---|---|---|
+| `<C-n>` / `<C-p>` | 다음/이전 후보 선택 | Insert |
+| `<CR>` | 후보 확정 | Insert |
+| `<C-Space>` | completion 팝업 수동 호출 | Insert |
+| `<C-e>` | completion 닫기 | Insert |
+| `<C-f>` / `<C-b>` | 문서 창 스크롤 | Insert |
 
-### Git — diffview (프로젝트 단위)
+### Treesitter textobjects
 
-| 키 | 동작 | 어원(mnemonic) | 모드 |
-|---|---|---|---|
-| `<leader>do` | `:DiffviewOpen` (working tree) | **d**iff **o**pen | Normal |
-| `<leader>dc` | `:DiffviewClose` | **d**iff **c**lose | Normal |
-| `<leader>dh` | `DiffviewFileHistory %` | **d**iff file **h**istory | Normal |
-| `<leader>dH` | 프로젝트 전체 커밋 히스토리 | 대문자 **H**istory (전체 범위) | Normal |
-| `<leader>dm` | 기본 브랜치 비교 (`:DiffviewOpen main` 또는 `master`) | **d**iff vs default branch (**m**ain/**m**aster) | Normal |
-| `<leader>dB` | base/target 입력 비교 함수 (`base...target`) | **d**iff + custom **B**ranch compare | Normal |
+| 키 | 동작 | 모드 |
+|---|---|---|
+| `af` / `if` | 함수 outer/inner 선택 | Operator-pending, Visual |
+| `ac` / `ic` | struct/interface/class outer/inner 선택 | Operator-pending, Visual |
+| `aa` / `ia` | 인자 outer/inner 선택 | Operator-pending, Visual |
+| `yaf` / `yif` | 함수 전체/본문 복사 | Normal |
+| `daa` / `cia` | 인자 삭제 / 인자 교체 입력 | Normal |
 
 ### 마크다운
 
-| 키 | 동작 | 어원(mnemonic) | 모드 |
-|---|---|---|---|
-| `<leader>mp` | `:MarkdownPreviewToggle` | **m**arkdown **p**review | Normal |
+| 키 | 동작 | 모드 |
+|---|---|---|
+| `<leader>mp` | `:MarkdownPreviewToggle` | Normal |
 
 ### Telescope
 
-| 키 | 동작 | 어원(mnemonic) | 모드 |
-|---|---|---|---|
-| `<leader>ff` | 파일 퍼지 검색 | **f**ind **f**iles | Normal |
-| `<leader>fg` | 프로젝트 전체 live grep | **f**ind by **g**rep | Normal |
-| `<leader>fb` | 버퍼 목록 | **f**ind **b**uffers | Normal |
-| `<leader>fh` | help tags 검색 | **f**ind **h**elp | Normal |
-| `<leader>fr` | 최근 연 파일 | **f**ind **r**ecent | Normal |
-| `<leader>fs` | 현재 파일 심볼 | **f**ind file **s**ymbols | Normal |
-| `<leader>fS` | 워크스페이스 심볼 | **f**ind workspace **S**ymbols | Normal |
-| `<leader>fd` | diagnostics 목록 | **f**ind **d**iagnostics | Normal |
-| `<leader>/` | 현재 버퍼 퍼지 검색 | `/` = in-buffer search | Normal |
+| 키 | 동작 | 모드 |
+|---|---|---|
+| `<leader>ff` | 파일 퍼지 검색 | Normal |
+| `<leader>fg` | 프로젝트 전체 live grep | Normal |
+| `<leader>fb` | 버퍼 목록 | Normal |
+| `<leader>fh` | help tags 검색 | Normal |
+| `<leader>fr` | 최근 연 파일 | Normal |
+| `<leader>fs` | 현재 파일 심볼 | Normal |
+| `<leader>fS` | 워크스페이스 심볼 | Normal |
+| `<leader>fd` | diagnostics 목록 | Normal |
+| `<leader>/` | 현재 버퍼 퍼지 검색 | Normal |
 
 ### LSP (`LspAttach` 시 버퍼 로컬)
 
-| 키 | 동작 | 어원(mnemonic) | 모드 |
-|---|---|---|---|
-| `gd` | 정의로 점프 | **g**oto **d**efinition | Normal |
-| `gD` | 선언으로 점프 | **g**oto **D**eclaration | Normal |
-| `gr` | 참조 찾기 | **g**oto **r**eferences | Normal |
-| `gi` | 구현으로 점프 | **g**oto **i**mplementation | Normal |
-| `K` | hover 문서 | 기본 LSP hover | Normal |
-| `<leader>rn` | 심볼 리네임 | **r**e**n**ame | Normal |
-| `<leader>ca` | code action | **c**ode **a**ction | Normal, Visual |
-| `[d` | 이전 진단 | 이전 **d**iagnostic | Normal |
-| `]d` | 다음 진단 | 다음 **d**iagnostic | Normal |
-| `<leader>le` | 현재 줄 진단 팝업 | **l**sp **e**rror | Normal |
-| `<leader>lf` | 파일 포맷팅(async) | **l**sp **f**ormat | Normal |
+| 키 | 동작 | 모드 |
+|---|---|---|
+| `gd` / `gD` / `gr` / `gi` | 정의/선언/참조/구현 이동 | Normal |
+| `K` | hover 문서 | Normal |
+| `<leader>rn` | 심볼 리네임 | Normal |
+| `<leader>ca` | code action | Normal, Visual |
+| `[d` / `]d` | 이전/다음 진단 | Normal |
+| `<leader>le` | 현재 줄 진단 팝업 | Normal |
+| `<leader>lf` | 파일 포맷팅(async) | Normal |

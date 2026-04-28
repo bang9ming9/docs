@@ -3,7 +3,7 @@
 
 gruvbox 다크 테마와 기본 내장 기능(LSP/Treesitter)을 중심으로, 필요한 플러그인만 얇게 조합한 Neovim 환경 기록이다. 문서 내 `<leader>`는 `\\`(백슬래시) 기준이다.
 
-> 실제 사용 흐름(예: Git 확인 순서, 복사/클립보드 패턴, 자주 쓰는 단축키)은 [`neovim-workflows.md`](./neovim-workflows.md)로 분리했다.
+> 실제 사용 흐름(예: Git 확인 순서, 자동완성 조작, 복사/클립보드 패턴, 자주 쓰는 단축키)은 [`neovim-workflows.md`](./neovim-workflows.md)로 분리했다.
 
 ## 환경 정보
 
@@ -19,6 +19,7 @@ gruvbox 다크 테마와 기본 내장 기능(LSP/Treesitter)을 중심으로, �
 
 - [플러그인 목록](#플러그인-목록)
 - [플러그인별 상세 설명](#플러그인별-상세-설명)
+- [Mason 관리 외부 바이너리](#mason-관리-외부-바이너리)
 - [전역 설정 (`vim.opt.*`)](#전역-설정-vimopt)
 - [첫 설치 가이드](#첫-설치-가이드)
 - [향후 고려 중인 플러그인](#향후-고려-중인-플러그인)
@@ -39,12 +40,19 @@ gruvbox 다크 테마와 기본 내장 기능(LSP/Treesitter)을 중심으로, �
 | `sindrets/diffview.nvim` | [링크](https://github.com/sindrets/diffview.nvim) | 프로젝트 전체 diff/히스토리 뷰 | `Diffview*` 명령 또는 `<leader>d*` |
 | `iamcco/markdown-preview.nvim` | [링크](https://github.com/iamcco/markdown-preview.nvim) | 마크다운 브라우저 프리뷰 | `ft=markdown` |
 | `nvim-treesitter/nvim-treesitter` | [링크](https://github.com/nvim-treesitter/nvim-treesitter) | 트리 기반 하이라이트/들여쓰기 | `BufReadPost`, `BufNewFile` |
+| `nvim-treesitter/nvim-treesitter-textobjects` | [링크](https://github.com/nvim-treesitter/nvim-treesitter-textobjects) | 함수/인자/클래스 단위 textobject 선택·이동 | treesitter 의존 로드 |
 | `williamboman/mason.nvim` | [링크](https://github.com/williamboman/mason.nvim) | 외부 바이너리 설치/관리 | `:Mason*` 명령 |
 | `williamboman/mason-lspconfig.nvim` | [링크](https://github.com/williamboman/mason-lspconfig.nvim) | Mason-LSP 연결 | mason 의존 즉시 로드 |
+| `WhoIsSethDaniel/mason-tool-installer.nvim` | [링크](https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim) | LSP 외 도구(lint/debug 등) 자동 설치 | mason 의존 즉시 로드 |
 | `neovim/nvim-lspconfig` | [링크](https://github.com/neovim/nvim-lspconfig) | LSP 설정 및 attach 훅 | `BufReadPre`, `BufNewFile` |
+| `hrsh7th/nvim-cmp` | [링크](https://github.com/hrsh7th/nvim-cmp) | Insert 모드 자동완성 엔진 | `InsertEnter`, `CmdlineEnter` |
+| `hrsh7th/cmp-nvim-lsp` | [링크](https://github.com/hrsh7th/cmp-nvim-lsp) | LSP completion source | cmp 의존 로드 |
+| `hrsh7th/cmp-buffer` | [링크](https://github.com/hrsh7th/cmp-buffer) | 현재/열린 버퍼 completion source | cmp 의존 로드 |
+| `hrsh7th/cmp-path` | [링크](https://github.com/hrsh7th/cmp-path) | 파일 경로 completion source | cmp 의존 로드 |
+| `hrsh7th/cmp-cmdline` | [링크](https://github.com/hrsh7th/cmp-cmdline) | `:` 명령행 completion source | cmp 의존 로드 |
+| `L3MON4D3/LuaSnip` | [링크](https://github.com/L3MON4D3/LuaSnip) | 스니펫 엔진 | cmp/snippet 사용 시 로드 |
+| `saadparwaiz1/cmp_luasnip` | [링크](https://github.com/saadparwaiz1/cmp_luasnip) | LuaSnip completion source 연결 | cmp 의존 로드 |
 | `nvim-telescope/telescope.nvim` | [링크](https://github.com/nvim-telescope/telescope.nvim) | 파일/grep/심볼/진단 퍼지 검색 | `:Telescope` 또는 `<leader>f*` |
-
-> Mason 자동 설치 바이너리: `gopls`, `lua-language-server`
 
 ## 플러그인별 상세 설명
 
@@ -69,17 +77,31 @@ gruvbox 다크 테마와 기본 내장 기능(LSP/Treesitter)을 중심으로, �
 ### `iamcco/markdown-preview.nvim`
 마크다운 문서를 브라우저에서 즉시 렌더링해 확인한다. Mermaid까지 포함해 문서 결과물을 빠르게 검증할 수 있다. 코드 작성과 문서 미리보기를 Neovim 내부 키맵 하나로 왕복하는 용도로 사용한다.
 
-### `nvim-treesitter/nvim-treesitter`
-정확한 구문 인식 기반 하이라이트와 들여쓰기를 제공한다. Go/Lua/웹/문서/설정 파일군을 폭넓게 `ensure_installed`로 지정해 언어별 품질 편차를 줄였다. Vim 기본 `syntax`를 fallback으로 남겨 안정성도 같이 확보했다.
+### `nvim-treesitter/nvim-treesitter` + `nvim-treesitter/nvim-treesitter-textobjects`
+Treesitter는 정확한 구문 인식 기반 하이라이트/들여쓰기 품질을 맡고, textobjects는 그 구문 트리를 함수·인자·클래스 같은 편집 단위로 재사용하게 해 준다. 즉, 이 설정에서는 “보기 품질”(highlight/indent)과 “구조 단위 편집”(textobject)을 같은 트리 기반으로 묶는다.
 
-### `williamboman/mason.nvim` + `williamboman/mason-lspconfig.nvim`
-LSP 서버 같은 외부 실행 파일 설치를 Neovim 내부에서 관리한다. 이 설정에서는 `gopls`, `lua_ls`를 자동 보장해 새 환경에서도 부트스트랩이 단순하다. mason-lspconfig를 연결점으로 사용해 설치 상태와 LSP 활성화를 자연스럽게 이어준다.
+### `williamboman/mason.nvim` + `williamboman/mason-lspconfig.nvim` + `WhoIsSethDaniel/mason-tool-installer.nvim`
+mason은 외부 실행 파일 설치를 담당하고, mason-lspconfig는 LSP 서버 보장/연결을 맡는다. mason-tool-installer는 LSP 외 도구(린터·디버거·포매터 등)의 보장 설치를 맡아, 새 환경에서도 필요한 바이너리 집합을 같은 경로로 재현하게 해 준다.
 
 ### `neovim/nvim-lspconfig`
 Neovim 0.12의 native API(`vim.lsp.config`, `vim.lsp.enable`) 기준으로 LSP를 구성했다. `gopls`에는 `staticcheck`, `gofumpt`, `unusedparams` 분석을 켜고, `lua_ls`에는 `vim` 글로벌/서드파티 검사 설정을 반영했다. 키맵은 `LspAttach`에서 버퍼 로컬로 묶어 과도한 전역 충돌을 피했다.
 
+### `hrsh7th/nvim-cmp` + completion source(`cmp-*`) + `LuaSnip`
+자동완성 계층은 `nvim-cmp`가 UI/선택/확정을 담당하고, source 플러그인이 후보 공급을 분담한다. 이 설정에서는 LSP(`cmp-nvim-lsp`), 버퍼(`cmp-buffer`), 경로(`cmp-path`), 명령행(`cmp-cmdline`), 스니펫(`LuaSnip` + `cmp_luasnip`)을 함께 연결해 Insert 모드 입력을 한 UI로 통합한다.
+
 ### `nvim-telescope/telescope.nvim`
 파일 찾기, live grep, 버퍼/헬프/심볼/진단 조회를 통합한 검색 UI다. `prompt_position=top`, `sorting_strategy=ascending`, `path_display=truncate`로 결과 읽기 흐름을 단순화했다. neo-tree가 계층 탐색 도구라면 telescope는 질의 기반 탐색 도구다.
+
+## Mason 관리 외부 바이너리
+
+아래 표는 현재 설정 문서 기준으로 자동 보장 대상(또는 기본 설치 대상으로 관리하는) 바이너리 묶음이다.
+
+| 도구 | 용도 | 관리 계층 |
+|---|---|---|
+| `gopls` | Go LSP 서버 | `mason-lspconfig.nvim` |
+| `lua-language-server` (`lua_ls`) | Lua LSP 서버 | `mason-lspconfig.nvim` |
+| `golangci-lint` | Go 린터 | `mason-tool-installer.nvim` |
+| `dlv` | Go 디버거(Delve) | `mason-tool-installer.nvim` |
 
 ## 전역 설정 (`vim.opt.*`)
 
@@ -115,11 +137,20 @@ git clone <YOUR_REPO_URL> ~/.config/nvim
 nvim
 ```
 
-Neovim에 진입한 뒤 다음 순서로 실행한다.
+초기 부트스트랩은 아래 순서로 진행된다.
+
+1. 첫 실행 시 `lazy.nvim`이 lock 기준으로 플러그인을 설치/동기화한다.
+2. Go/Lua 파일을 열면 LSP attach 흐름에서 `mason-lspconfig`가 필요한 서버(`gopls`, `lua_ls`) 보장 설치를 처리한다.
+3. LSP 외 도구(예: `golangci-lint`, `dlv`)는 `mason-tool-installer`가 보장 설치 대상으로 관리한다.
+
+즉, 이 설정은 별도 수동 설치 명령을 많이 치기보다 “파일을 열어 작업을 시작하면 필요한 도구가 채워지는 흐름”을 기본으로 둔다.
+
+설치/연결 상태 확인은 아래 순서로 점검한다.
 
 ```vim
-:Lazy sync
-:Mason install gopls lua-language-server
+:Mason
+:LspInfo
+:checkhealth lsp
 ```
 
 선택 사항으로 Treesitter 파서 상태를 확인하려면:
@@ -128,23 +159,10 @@ Neovim에 진입한 뒤 다음 순서로 실행한다.
 :TSInstallInfo
 ```
 
-LSP 상태 확인은 먼저 health 체크를 권장한다.
-
-```vim
-:checkhealth vim.lsp
-```
-
-필요하면 현재 버퍼에 attach된 서버를 추가로 확인한다.
-
-```vim
-:LspInfo
-```
-
 ## 향후 고려 중인 플러그인
 
 - `folke/which-key.nvim`: 리더 키 조합을 팝업으로 보여줘 키맵 발견성을 높인다.
 - `nvim-lualine/lualine.nvim`: 상태줄 정보를 구조화해 현재 컨텍스트 확인을 쉽게 한다.
-- `hrsh7th/nvim-cmp`: 자동완성 엔진으로 LSP/스니펫 후보를 통합한다.
 - `windwp/nvim-autopairs`: 괄호/따옴표 자동 페어 입력을 보강한다.
 - `kylechui/nvim-surround`: 문자열/태그 감싸기·교체·삭제 작업을 빠르게 한다.
 - `numToStr/Comment.nvim`: 주석 토글을 일관된 키맵으로 제공한다.
