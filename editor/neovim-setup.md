@@ -1,9 +1,9 @@
 # Neovim 설정 스냅샷
-이 설정은 Go 개발을 중심으로, 필요한 플러그인만 얇게 조합해 유지하는 현재 Neovim 구성 기록이다.
+이 문서는 Go 개발을 중심으로 유지 중인 현재 Neovim 구성을 기록한 스냅샷이다.
 
-gruvbox 다크 테마와 기본 내장 기능(LSP/Treesitter)을 축으로 두고, 문서 내 `<leader>`는 `\\`(백슬래시) 기준으로 표기한다.
+gruvbox 다크 테마와 기본 내장 기능(LSP/Treesitter)을 축으로 필요한 플러그인을 조합했고, 문서 내 `<leader>` 표기는 `\\`(백슬래시) 기준이다.
 
-> 실제 사용 순서와 조작 메모는 [`neovim-workflows.md`](./neovim-workflows.md)에서 따로 관리한다.
+> 실제 사용 흐름은 [`neovim-workflows.md`](./neovim-workflows.md)를 참고한다.
 
 ## 환경 정보
 
@@ -143,7 +143,7 @@ nvim
 2. Go/Lua 파일을 열면 `mason-lspconfig` 경로에서 필요한 서버(`gopls`, `lua_ls`) 보장 설치를 처리한다.
 3. LSP 외 도구(예: `golangci-lint`, `dlv`)는 `mason-tool-installer` 보장 목록으로 관리한다.
 
-즉, 이 설정은 별도 수동 설치를 최소화하고 파일을 열어 작업을 시작하는 흐름에서 필요한 도구를 채우는 방식을 전제로 한다.
+즉, 이 설정은 별도 수동 설치를 최소화하고, 파일을 열어 작업을 시작하는 흐름에서 필요한 도구가 채워지도록 구성했다.
 
 설치/연결 상태 확인은 아래 순서로 점검한다.
 
