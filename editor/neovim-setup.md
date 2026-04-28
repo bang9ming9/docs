@@ -1,9 +1,9 @@
 # Neovim 설정 스냅샷
-이 설정은 Go 개발이 주목적이고 최소주의를 지향한다.
+이 설정은 Go 개발을 중심으로, 필요한 플러그인만 얇게 조합해 유지하는 현재 Neovim 구성 기록이다.
 
-gruvbox 다크 테마와 기본 내장 기능(LSP/Treesitter)을 중심으로, 필요한 플러그인만 얇게 조합한 Neovim 환경 기록이다. 문서 내 `<leader>`는 `\\`(백슬래시) 기준이다.
+gruvbox 다크 테마와 기본 내장 기능(LSP/Treesitter)을 축으로 두고, 문서 내 `<leader>`는 `\\`(백슬래시) 기준으로 표기한다.
 
-> 실제 사용 흐름(예: Git 확인 순서, 자동완성 조작, 복사/클립보드 패턴, 자주 쓰는 단축키)은 [`neovim-workflows.md`](./neovim-workflows.md)로 분리했다.
+> 실제 사용 순서와 조작 메모는 [`neovim-workflows.md`](./neovim-workflows.md)에서 따로 관리한다.
 
 ## 환경 정보
 
@@ -57,44 +57,44 @@ gruvbox 다크 테마와 기본 내장 기능(LSP/Treesitter)을 중심으로, �
 ## 플러그인별 상세 설명
 
 ### `folke/lazy.nvim`
-플러그인 설치/업데이트/락파일 관리를 맡는 기반 계층이다. 지연 로딩을 전제로 구성해서 시작 시간을 불필요하게 늘리지 않도록 설계했다. 이 설정에서는 키/이벤트/명령 단위로 로딩 조건을 명확히 분리해, 기능 추가 시에도 구조가 흐트러지지 않게 유지한다.
+플러그인 설치/업데이트/락파일 관리를 맡는 기반 계층이다. 이 설정은 키/이벤트/명령 조건으로 로딩 시점을 분리해, 시작 비용과 기능 확장 시 복잡도를 함께 관리한다.
 
 ### `ellisonleao/gruvbox.nvim`
-전체 UI 톤을 결정하는 테마다. `priority=1000`으로 가장 먼저 로드해 다른 플러그인의 하이라이트 기준점 역할을 하게 했다. `background=dark`를 명시해 터미널/GUI 환경에서 색감 편차를 줄인다.
+전체 UI 기준 테마다. `priority=1000`으로 먼저 로드해 하이라이트 기준을 고정하고, `background=dark`로 터미널/GUI 간 색감 편차를 줄인다.
 
 ### `nvim-neo-tree/neo-tree.nvim` (+ `plenary.nvim`, `nvim-web-devicons`, `nui.nvim`)
-좌측 트리 중심의 파일 탐색을 담당한다. `follow_current_file`로 현재 편집 파일을 트리에서 자동 추적하고, 파일을 열면 트리를 닫아 코드 영역을 확보한다. 파일 “구조를 눈으로 훑는 작업”은 neo-tree가 맡고, “이름/내용 기반 탐색”은 telescope가 맡도록 역할을 나눴다.
+사이드바 파일 트리를 제공한다. `follow_current_file`를 켜서 현재 버퍼와 트리 위치를 맞추고, 파일 오픈 시 트리를 닫는 옵션으로 편집 영역을 확보한다.
 
 ### `lewis6991/gitsigns.nvim`
-현재 버퍼에 Git hunk 표시를 붙이고 hunk 이동/preview/blame/diff 명령을 제공하는 Git 보조 계층이다. 이 설정에서는 파일 내부 변경을 줄 단위로 식별할 수 있게 해 주는 기본 관찰 도구 역할을 맡는다.
+버퍼 내 Git hunk 표시와 hunk 단위 preview/blame/diff 명령을 제공한다. 파일 내부 변경을 줄 단위로 점검할 때 기준이 되는 구성 요소다.
 
 ### `tpope/vim-fugitive`
-`:Git` 명령 집합을 중심으로 status, blame, log, 파일 diff 같은 Git 작업을 Neovim 안에서 일관되게 수행할 수 있게 한다. 이 설정에서는 프로젝트 상태와 파일 단위 Git 정보를 조회하는 표준 인터페이스로 둔다.
+`:Git` 중심의 status/blame/log/diff 인터페이스를 제공한다. 프로젝트 상태 확인과 파일 단위 Git 조회를 Neovim 내부에서 일관된 명령 체계로 처리한다.
 
 ### `sindrets/diffview.nvim`
-프로젝트 단위 diff 뷰(working tree, 브랜치 비교, 파일 히스토리)를 패널 UI로 제공한다. 이 설정에서는 범위가 큰 변경을 파일 목록과 상세 diff로 분리해 확인할 수 있는 전용 뷰어로 배치한다.
+프로젝트 단위 diff 및 히스토리 뷰를 패널 UI로 제공한다. working tree 비교와 브랜치 범위 비교를 같은 도구로 다룰 수 있게 구성했다.
 
 ### `iamcco/markdown-preview.nvim`
-마크다운 문서를 브라우저에서 즉시 렌더링해 확인한다. Mermaid까지 포함해 문서 결과물을 빠르게 검증할 수 있다. 코드 작성과 문서 미리보기를 Neovim 내부 키맵 하나로 왕복하는 용도로 사용한다.
+마크다운 렌더링 결과를 브라우저에서 확인한다. 문서 편집 결과(예: Mermaid 포함)를 Neovim 키맵에서 바로 점검하는 용도로 둔다.
 
 ### `nvim-treesitter/nvim-treesitter` + `nvim-treesitter/nvim-treesitter-textobjects`
-Treesitter는 정확한 구문 인식 기반 하이라이트/들여쓰기 품질을 맡고, textobjects는 그 구문 트리를 함수·인자·클래스 같은 편집 단위로 재사용하게 해 준다. 즉, 이 설정에서는 “보기 품질”(highlight/indent)과 “구조 단위 편집”(textobject)을 같은 트리 기반으로 묶는다.
+Treesitter는 구문 기반 하이라이트/들여쓰기 정확도를 담당하고, textobjects는 같은 구문 트리를 함수·인자·클래스 단위 선택/조작에 재사용한다.
 
 ### `williamboman/mason.nvim` + `williamboman/mason-lspconfig.nvim` + `WhoIsSethDaniel/mason-tool-installer.nvim`
-mason은 외부 실행 파일 설치를 담당하고, mason-lspconfig는 LSP 서버 보장/연결을 맡는다. mason-tool-installer는 LSP 외 도구(린터·디버거·포매터 등)의 보장 설치를 맡아, 새 환경에서도 필요한 바이너리 집합을 같은 경로로 재현하게 해 준다.
+mason은 외부 실행 파일 설치를 맡고, mason-lspconfig는 LSP 서버 보장 설치와 연결을 담당한다. mason-tool-installer는 LSP 외 도구를 같은 방식으로 관리해 환경 재현성을 맞춘다.
 
 ### `neovim/nvim-lspconfig`
-Neovim 0.12의 native API(`vim.lsp.config`, `vim.lsp.enable`) 기준으로 LSP를 구성했다. `gopls`에는 `staticcheck`, `gofumpt`, `unusedparams` 분석을 켜고, `lua_ls`에는 `vim` 글로벌/서드파티 검사 설정을 반영했다. 키맵은 `LspAttach`에서 버퍼 로컬로 묶어 과도한 전역 충돌을 피했다.
+Neovim 0.12의 native API(`vim.lsp.config`, `vim.lsp.enable`) 기준으로 LSP를 구성했다. `gopls`의 `staticcheck`, `gofumpt`, `unusedparams` 분석을 켜고, `lua_ls`는 `vim` 글로벌/서드파티 검사 설정을 반영했다. 키맵은 `LspAttach`에서 버퍼 로컬로 등록한다.
 
 ### `hrsh7th/nvim-cmp` + completion source(`cmp-*`) + `LuaSnip`
-자동완성 계층은 `nvim-cmp`가 UI/선택/확정을 담당하고, source 플러그인이 후보 공급을 분담한다. 이 설정에서는 LSP(`cmp-nvim-lsp`), 버퍼(`cmp-buffer`), 경로(`cmp-path`), 명령행(`cmp-cmdline`), 스니펫(`LuaSnip` + `cmp_luasnip`)을 함께 연결해 Insert 모드 입력을 한 UI로 통합한다.
+`nvim-cmp`가 자동완성 UI/선택/확정을 담당하고 source 플러그인이 후보를 공급한다. 현재 구성은 LSP, 버퍼, 경로, 명령행, 스니펫 source를 함께 연결해 Insert 모드 입력 경로를 단일 인터페이스로 맞춘다.
 
 ### `nvim-telescope/telescope.nvim`
-파일 찾기, live grep, 버퍼/헬프/심볼/진단 조회를 통합한 검색 UI다. `prompt_position=top`, `sorting_strategy=ascending`, `path_display=truncate`로 결과 읽기 흐름을 단순화했다. neo-tree가 계층 탐색 도구라면 telescope는 질의 기반 탐색 도구다.
+파일/grep/버퍼/심볼/진단 조회를 통합한 질의형 검색 UI다. `prompt_position=top`, `sorting_strategy=ascending`, `path_display=truncate`를 기본값으로 사용한다.
 
 ## Mason 관리 외부 바이너리
 
-아래 표는 현재 설정 문서 기준으로 자동 보장 대상(또는 기본 설치 대상으로 관리하는) 바이너리 묶음이다.
+아래는 현재 설정에서 Mason 계층으로 관리하는 바이너리 목록이다.
 
 | 도구 | 용도 | 관리 계층 |
 |---|---|---|
@@ -128,7 +128,7 @@ Neovim 0.12의 native API(`vim.lsp.config`, `vim.lsp.enable`) 기준으로 LSP�
 | `showmode` | `true` | 현재 모드 표시 |
 | `laststatus` | `2` | 상태줄 항상 표시 |
 
-> 참고: `syntax`는 `vim.opt` 테이블 항목이라기보다 Vim 명령(`:syntax on`) 성격에 가깝다. 이 설정에서는 Treesitter가 주 하이라이트를 담당하고, 기본 syntax는 fallback으로만 둔다.
+> 참고: `syntax`는 `vim.opt` 항목이라기보다 Vim 명령(`:syntax on`) 성격에 가깝다. 이 설정에서는 Treesitter를 기본 하이라이트로 두고, Vim syntax는 fallback으로만 둔다.
 
 ## 첫 설치 가이드
 
@@ -140,10 +140,10 @@ nvim
 초기 부트스트랩은 아래 순서로 진행된다.
 
 1. 첫 실행 시 `lazy.nvim`이 lock 기준으로 플러그인을 설치/동기화한다.
-2. Go/Lua 파일을 열면 LSP attach 흐름에서 `mason-lspconfig`가 필요한 서버(`gopls`, `lua_ls`) 보장 설치를 처리한다.
-3. LSP 외 도구(예: `golangci-lint`, `dlv`)는 `mason-tool-installer`가 보장 설치 대상으로 관리한다.
+2. Go/Lua 파일을 열면 `mason-lspconfig` 경로에서 필요한 서버(`gopls`, `lua_ls`) 보장 설치를 처리한다.
+3. LSP 외 도구(예: `golangci-lint`, `dlv`)는 `mason-tool-installer` 보장 목록으로 관리한다.
 
-즉, 이 설정은 별도 수동 설치 명령을 많이 치기보다 “파일을 열어 작업을 시작하면 필요한 도구가 채워지는 흐름”을 기본으로 둔다.
+즉, 이 설정은 별도 수동 설치를 최소화하고 파일을 열어 작업을 시작하는 흐름에서 필요한 도구를 채우는 방식을 전제로 한다.
 
 설치/연결 상태 확인은 아래 순서로 점검한다.
 
