@@ -1,14 +1,15 @@
 # Neovim 설정 스냅샷
+
 이 설정은 Go 개발을 중심으로, 필요한 플러그인만 얇게 조합해 유지하는 현재 Neovim 구성 기록이다.
 
-gruvbox 다크 테마와 기본 내장 기능(LSP/Treesitter)을 축으로 두고, 문서 내 `<leader>`는 `\\`(백슬래시) 기준으로 표기한다.
+gruvbox 다크 테마와 기본 내장 기능(LSP/Treesitter)을 축으로 두고, 문서 내 키 표기는 `<leader>` = `\\`(백슬래시) 기준으로 통일한다.
 
 > 실제 사용 순서와 조작 메모는 [`neovim-workflows.md`](./neovim-workflows.md)에서 따로 관리한다.
 
 ## 환경 정보
 
 | 항목 | 값 |
-|---|---|
+| --- | --- |
 | Neovim | `NVIM v0.12.1` (LuaJIT 2.1.1774896198, Release build) |
 | OS | macOS (Darwin 25.3.0, Apple Silicon) |
 | 플러그인 매니저 | [`folke/lazy.nvim`](https://github.com/folke/lazy.nvim) (stable 브랜치) |
@@ -28,7 +29,7 @@ gruvbox 다크 테마와 기본 내장 기능(LSP/Treesitter)을 축으로 두�
 ## 플러그인 목록
 
 | 이름 | GitHub | 역할 | 로딩 전략 |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `folke/lazy.nvim` | [링크](https://github.com/folke/lazy.nvim) | 플러그인 매니저, 지연 로딩 | 시작 시 로드 |
 | `ellisonleao/gruvbox.nvim` | [링크](https://github.com/ellisonleao/gruvbox.nvim) | 컬러스킴 | 시작 시 즉시 로드 (`priority=1000`) |
 | `nvim-neo-tree/neo-tree.nvim` | [링크](https://github.com/nvim-neo-tree/neo-tree.nvim) | 파일 탐색기 사이드바 | `<C-n>` 키로 로드 |
@@ -97,7 +98,7 @@ Neovim 0.12의 native API(`vim.lsp.config`, `vim.lsp.enable`) 기준으로 LSP�
 아래는 현재 설정에서 Mason 계층으로 관리하는 바이너리 목록이다.
 
 | 도구 | 용도 | 관리 계층 |
-|---|---|---|
+| --- | --- | --- |
 | `gopls` | Go LSP 서버 | `mason-lspconfig.nvim` |
 | `lua-language-server` (`lua_ls`) | Lua LSP 서버 | `mason-lspconfig.nvim` |
 | `golangci-lint` | Go 린터 | `mason-tool-installer.nvim` |
@@ -106,7 +107,7 @@ Neovim 0.12의 native API(`vim.lsp.config`, `vim.lsp.enable`) 기준으로 LSP�
 ## 전역 설정 (`vim.opt.*`)
 
 | 옵션 | 값 | 설명 |
-|---|---|---|
+| --- | --- | --- |
 | `number` | `true` | 줄번호 표시 |
 | `wrap` | `true` | 긴 줄 자동 줄바꿈 |
 | `visualbell` | `true` | 비프음 대신 시각 알림 |
