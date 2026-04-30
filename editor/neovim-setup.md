@@ -217,10 +217,7 @@ nvim
 
 1. 첫 실행 시 `lazy.nvim`이 lock 기준으로 플러그인을 설치/동기화한다.
 2. Go/Lua 파일을 열면 `mason-lspconfig` 경로에서 필요한 서버(`gopls`, `lua_ls`) 보장 설치를 처리한다.
-3. LSP 외 도구(예: `golangci-lint`, `dlv`)는 `mason-tool-installer` 보장 목록으로 관리한다.
-   `golangci-lint`는 즉시 활용 가능하고,
-   `dlv`는 현재 구성에서 주로 CLI 용도이며
-   Neovim 내부 디버깅 연동은 `nvim-dap` 도입 시점에 확장한다.
+3. LSP 외 도구(예: `golangci-lint`, `dlv`)는 `mason-tool-installer` 보장 목록으로 관리한다. `golangci-lint`는 즉시 활용 가능하고, `dlv`는 현재 구성에서 주로 CLI 용도이며 Neovim 내부 디버깅 연동은 `nvim-dap` 도입 시점에 확장한다.
 
 즉, 이 설정은 별도 수동 설치를 최소화하고
 파일을 열어 작업을 시작하는 흐름에서 필요한 도구를 채우는 방식을 전제로 한다.
