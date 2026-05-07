@@ -196,3 +196,9 @@ singleton 운영에서 자주 오해되는 부분을 정리하면:
 ## 짧은 요약
 
 Kubernetes에서 `replica=1` singleton Pod 운영은 간단하지만 공백/중복 가능성을 제거하지 못한다. DB write 후 publish 순서는 타당해도 두 작업은 분리된 side effect라 장애 시 불일치가 생긴다. 실무적으로는 failover를 몇 초 허용할 수 있다면 replica 2~3, leader election, idempotent consumer, outbox pattern, graceful shutdown 조합이 권장된다. 반대로 1초 공백도 없고 중복도 불가한 요구는 일반 K8s singleton 방식만으로 해결하기 어렵고, DB lock·외부 코디네이터·전용 런타임·managed service·broker-native ordering·아키텍처 분리 같은 추가 제어가 필요하다.
+
+## 함께 보면 좋은 문서
+
+- [메시지 큐 핵심 개념 정리](../edd/mq-core-concepts.md): consumer, ack/nack, retry, idempotency의 기본 용어를 확인할 때 참고한다.
+- [RabbitMQ, Kafka, Redis Streams 멀티 컨슈머 의미론 비교](../edd/rabbitmq-kafka-redis-streams-multi-consumer-semantics.md): 브로커별 소비자 독립성 단위와 장애 시 적체 위치를 함께 볼 수 있다.
+- [DLQ 운영 가이드](../edd/dlq-operational-guide.md): 소비 실패가 누적될 때 운영 판단과 재처리 흐름을 함께 검토할 수 있다.

@@ -115,3 +115,9 @@ Redis Streams도 consumer group을 통해 여러 소비자 협력/복구를 지�
 같은 요구라도 브로커마다 관찰 포인트와 복구 방식이 다르기 때문에, 신규 소비자 추가 설계와 운영 기준을 한 세트로 정해두는 편이 좋다.
 
 결론적으로, “같은 메시지를 여러 소비자가 받아야 한다”는 문장을 만나면 먼저 시스템 이름보다 **독립 소비 단위를 어디에 둘지**부터 결정하는 편이 안전하다. 이 판단은 아키텍처 유연성과 장애 격리 수준에 큰 영향을 준다.
+
+## 함께 보면 좋은 문서
+
+- [메시지 큐 핵심 개념 정리](./mq-core-concepts.md): producer, consumer, broker, queue, ack/nack 같은 기본 용어를 다시 확인할 때 참고한다.
+- [DLQ 운영 가이드](./dlq-operational-guide.md): 독립 소비 단위별 실패 메시지를 어떻게 격리하고 운영할지 이어서 볼 수 있다.
+- [Kubernetes 단일 writer 소비자 운영 가이드](../kubernetes/kubernetes-single-writer-consumer-operations.md): consumer replica, leader election, idempotency를 Kubernetes 운영 관점에서 함께 검토할 때 참고한다.
