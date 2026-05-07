@@ -88,3 +88,9 @@ main queue는 정상 처리 경로, retry queue는 일시 실패 재시도를 �
 DLQ에 메시지가 있는 것 자체는 자연스러울 수 있지만(도메인 허용치 고려), 계속 증가하면 근본 원인 미해결 신호다.  
 운영은 모니터링 → 원인 분석 → 수정 → 재처리/폐기 판단 → 재발 방지의 루프로 관리해야 한다.  
 특히 일시적 실패와 영구적 실패를 구분해야 대응 비용과 장애 확산을 줄일 수 있다.
+
+## 함께 보면 좋은 문서
+
+- [메시지 큐 핵심 개념 정리](./mq-core-concepts.md): retry, DLQ, ack/nack, idempotency의 기본 의미를 먼저 맞출 때 참고한다.
+- [RabbitMQ, Kafka, Redis Streams 멀티 컨슈머 의미론 비교](./rabbitmq-kafka-redis-streams-multi-consumer-semantics.md): 브로커마다 실패와 적체를 관찰하는 단위가 어떻게 다른지 함께 볼 수 있다.
+- [Kubernetes single-writer consumer 운영 가이드](../kubernetes/kubernetes-single-writer-consumer-operations.md): consumer 운영에서 중복 처리와 outbox를 함께 설계해야 할 때 참고한다.

@@ -29,3 +29,9 @@
 
 ## 마무리
 입문 단계에서는 “Producer가 보내고, Consumer가 처리하며, 실패는 Retry/DLQ로 통제한다”만 정확히 잡아도 충분하다. 그 위에 RabbitMQ(라우팅 중심)와 SQS(큐 중심)의 구조 차이를 구분하면 실무 설계 판단이 훨씬 쉬워진다.
+
+## 함께 보면 좋은 문서
+
+- [DLQ 운영 가이드](./dlq-operational-guide.md): retry 이후 실패 메시지를 어떻게 격리하고 재처리/폐기 판단으로 연결할지 다룬다.
+- [RabbitMQ, Kafka, Redis Streams 멀티 컨슈머 의미론 비교](./rabbitmq-kafka-redis-streams-multi-consumer-semantics.md): 같은 이벤트를 여러 소비자가 받아야 할 때 브로커별 독립성 단위를 비교한다.
+- [Kubernetes single-writer consumer 운영 가이드](../kubernetes/kubernetes-single-writer-consumer-operations.md): 메시지 소비자가 Kubernetes에서 공백/중복 문제를 만날 때 함께 참고한다.
