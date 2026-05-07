@@ -93,4 +93,4 @@ DLQ에 메시지가 있는 것 자체는 자연스러울 수 있지만(도메인
 
 - [메시지 큐 핵심 개념 정리](./mq-core-concepts.md): retry, DLQ, ack/nack, idempotency의 기본 의미를 먼저 맞출 때 참고한다.
 - [RabbitMQ, Kafka, Redis Streams 멀티 컨슈머 의미론 비교](./rabbitmq-kafka-redis-streams-multi-consumer-semantics.md): 브로커마다 실패와 적체를 관찰하는 단위가 어떻게 다른지 함께 볼 수 있다.
-- [Kubernetes single-writer consumer 운영 가이드](../kubernetes/kubernetes-single-writer-consumer-operations.md): consumer 운영에서 중복 처리와 outbox를 함께 설계해야 할 때 참고한다.
+- [Kubernetes 단일 writer 소비자 운영 가이드](../kubernetes/kubernetes-single-writer-consumer-operations.md): consumer 운영에서 중복 처리와 outbox를 함께 설계해야 할 때 참고한다.

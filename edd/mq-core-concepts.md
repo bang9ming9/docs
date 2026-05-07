@@ -34,4 +34,4 @@
 
 - [DLQ 운영 가이드](./dlq-operational-guide.md): retry 이후 실패 메시지를 어떻게 격리하고 재처리/폐기 판단으로 연결할지 다룬다.
 - [RabbitMQ, Kafka, Redis Streams 멀티 컨슈머 의미론 비교](./rabbitmq-kafka-redis-streams-multi-consumer-semantics.md): 같은 이벤트를 여러 소비자가 받아야 할 때 브로커별 독립성 단위를 비교한다.
-- [Kubernetes single-writer consumer 운영 가이드](../kubernetes/kubernetes-single-writer-consumer-operations.md): 메시지 소비자가 Kubernetes에서 공백/중복 문제를 만날 때 함께 참고한다.
+- [Kubernetes 단일 writer 소비자 운영 가이드](../kubernetes/kubernetes-single-writer-consumer-operations.md): 메시지 소비자가 Kubernetes에서 공백/중복 문제를 만날 때 함께 참고한다.

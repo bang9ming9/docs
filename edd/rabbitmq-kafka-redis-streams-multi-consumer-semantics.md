@@ -120,4 +120,4 @@ Redis Streams도 consumer group을 통해 여러 소비자 협력/복구를 지�
 
 - [메시지 큐 핵심 개념 정리](./mq-core-concepts.md): producer, consumer, broker, queue, ack/nack 같은 기본 용어를 다시 확인할 때 참고한다.
 - [DLQ 운영 가이드](./dlq-operational-guide.md): 독립 소비 단위별 실패 메시지를 어떻게 격리하고 운영할지 이어서 볼 수 있다.
-- [Kubernetes single-writer consumer 운영 가이드](../kubernetes/kubernetes-single-writer-consumer-operations.md): consumer replica, leader election, idempotency를 Kubernetes 운영 관점에서 함께 검토할 때 참고한다.
+- [Kubernetes 단일 writer 소비자 운영 가이드](../kubernetes/kubernetes-single-writer-consumer-operations.md): consumer replica, leader election, idempotency를 Kubernetes 운영 관점에서 함께 검토할 때 참고한다.
