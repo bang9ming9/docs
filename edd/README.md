@@ -16,4 +16,4 @@
 
 ## 연결 문서
 
-- [Kubernetes single-writer consumer 운영 가이드](../kubernetes/kubernetes-single-writer-consumer-operations.md): 메시지 소비자가 Kubernetes에서 공백/중복/side effect 문제를 만날 때 함께 참고합니다.
+- [Kubernetes 단일 writer 소비자 운영 가이드](../kubernetes/kubernetes-single-writer-consumer-operations.md): 메시지 소비자가 Kubernetes에서 공백/중복/side effect 문제를 만날 때 함께 참고합니다.

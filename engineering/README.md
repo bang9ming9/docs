@@ -11,14 +11,28 @@
 
 ## 문서 목록
 
+### 개발 프로세스 / 리뷰 기준
+
 - [실무에서 다시 보는 TDD 원칙](./tdd-red-green-refactor-principles.md)
-- [코드에는 있지만 아직 켜지지 않은 기능, dormant feature 이해하기](./dormant-feature-understanding-guide.md)
 - [실무 리팩터링에서 AI를 깊게 썼을 때 놓치기 쉬운 것들](./ai-driven-refactoring-responsibility-checkpoints.md)
 - [작업 계획서를 더 잘 검토하기 위한 type 기반 체크리스트](./type-based-plan-checklist-guide.md)
-- [모노레포 vs 일반 단일 프로젝트](./monorepo-vs-single-project-repo-structure-guide.md)
+
+### AI 도구 활용 / 모델 선택
+
 - [Opus와 Sonnet, 실무에서 어떻게 나눠 이해하고 쓸 것인가](./opus-vs-sonnet-practical-usage-guide.md)
-- [MongoDB vs MySQL 조회 성능](./mongodb-vs-mysql-read-performance-practical.md)
+
+### 저장소 / 스키마 운영
+
+- [모노레포 vs 일반 단일 프로젝트](./monorepo-vs-single-project-repo-structure-guide.md)
 - [Buf 기반 Protobuf 운영](./buf-config-and-workflow.md)
+
+### 기능 상태 / 운영 판단
+
+- [코드에는 있지만 아직 켜지지 않은 기능, dormant feature 이해하기](./dormant-feature-understanding-guide.md)
+
+### 데이터 저장소 판단
+
+- [MongoDB vs MySQL 조회 성능](./mongodb-vs-mysql-read-performance-practical.md)
 
 ## 경계 사례
 

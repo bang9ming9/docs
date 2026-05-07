@@ -22,20 +22,20 @@
 
 ## 주요 문서
 
-- [클린 아키텍처, 헥사고날, 레이어드 아키텍처를 어떻게 구분할까](./architecture/clean-hexagonal-layered-architecture-practical-comparison.md)
+- [아키텍처 패턴 실무 비교](./architecture/clean-hexagonal-layered-architecture-practical-comparison.md)
 - [메시지 큐 핵심 개념 정리](./edd/mq-core-concepts.md)
-- [DLQ(Dead Letter Queue), 왜 필요하고 어떻게 운영해야 할까](./edd/dlq-operational-guide.md)
-- [같은 이벤트를 여러 소비자가 받아야 할 때](./edd/rabbitmq-kafka-redis-streams-multi-consumer-semantics.md)
-- [Kubernetes 환경에서 단일 writer처럼 동작해야 하는 메시지 소비 모듈 운영 가이드](./kubernetes/kubernetes-single-writer-consumer-operations.md)
-- [Go에서 JSON marshal한 `[]byte`가 DB에 base64처럼 저장되는 이유](./go/go-json-byte-base64-in-json-column.md)
-- [GitHub Actions · Runner · Docker · Registry · Argo CD · Kubernetes · Terraform · Vault를 실무 흐름으로 구분해보기](./infra/ci-cd/github-actions-runner-argocd-kubernetes-terraform-vault.md)
-- [실무 리팩터링에서 AI를 깊게 썼을 때 놓치기 쉬운 것들](./engineering/ai-driven-refactoring-responsibility-checkpoints.md)
+- [DLQ 운영 가이드](./edd/dlq-operational-guide.md)
+- [멀티 컨슈머 의미론 비교](./edd/rabbitmq-kafka-redis-streams-multi-consumer-semantics.md)
+- [Kubernetes 단일 writer 소비자 운영 가이드](./kubernetes/kubernetes-single-writer-consumer-operations.md)
+- [Go `[]byte` JSON 직렬화와 base64 저장](./go/go-json-byte-base64-in-json-column.md)
+- [CI/CD 도구 책임 경계 정리](./infra/ci-cd/github-actions-runner-argocd-kubernetes-terraform-vault.md)
+- [AI-assisted 리팩터링 책임 체크포인트](./engineering/ai-driven-refactoring-responsibility-checkpoints.md)
 
 ## 처음 읽는 순서
 
 1. 저장소의 범위를 잡고 싶다면 이 README와 각 디렉토리 README를 먼저 봅니다.
 2. 메시징/이벤트 기반 설계가 궁금하다면 [MQ 핵심 개념](./edd/mq-core-concepts.md) → [멀티 컨슈머 의미론](./edd/rabbitmq-kafka-redis-streams-multi-consumer-semantics.md) → [DLQ 운영](./edd/dlq-operational-guide.md) 순서로 읽습니다.
-3. Kubernetes에서 소비자 운영 이슈를 다룬다면 [Kubernetes single-writer consumer 운영 가이드](./kubernetes/kubernetes-single-writer-consumer-operations.md)를 함께 봅니다.
+3. Kubernetes에서 소비자 운영 이슈를 다룬다면 [Kubernetes 단일 writer 소비자 운영 가이드](./kubernetes/kubernetes-single-writer-consumer-operations.md)를 함께 봅니다.
 4. 서비스 구조 설계 판단이 필요하다면 [아키텍처 비교 문서](./architecture/clean-hexagonal-layered-architecture-practical-comparison.md)를 읽고, 구현/검토 방식은 [engineering/](./engineering/) 문서로 이어서 확인합니다.
 5. Go 관련 문제를 찾는다면 [go/](./go/)에서 언어 동작이나 생태계에 직접 연결된 문서를 확인합니다.
 
