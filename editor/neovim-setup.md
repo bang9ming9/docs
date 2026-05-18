@@ -1,27 +1,27 @@
 # Neovim 설정 스냅샷
 
-이 문서는 현재 사용 중인 Neovim 설정을 기록한 스냅샷이다. 처음에는 Go 개발을 중심으로 필요한 플러그인만 얇게 붙이는 구성이었지만, 실제 작업 범위가 Go 백엔드, Solidity/Foundry 프로젝트, TypeScript/React 코드 확인, 문서 작성, 브랜치 리뷰까지 넓어지면서 설정도 함께 확장되었다.
+이 문서는 현재 PC에서 사용 중인 Neovim 설정을 기록한 스냅샷이다. 설정 파일은 `~/.config/nvim/init.lua`이며, 플러그인 잠금 파일은 `~/.config/nvim/lazy-lock.json`이다.
 
-따라서 이 문서는 “추천 플러그인 목록”이라기보다, 현재 로컬 설정이 어떤 문제를 해결하기 위해 구성되어 있는지 정리하는 기준 문서에 가깝다. 실제 키 조작과 반복 작업 흐름은 [`neovim-workflows.md`](./neovim-workflows.md)에서 따로 정리한다.
+이 문서는 현재 로컬 설정에 포함된 플러그인, LSP, 자동완성, Treesitter, Mason 관리 도구를 정리한다. 실제 키 조작과 반복 작업 흐름은 [`neovim-workflows.md`](./neovim-workflows.md)에서 따로 정리한다.
 
-문서 내 `<leader>` 표기는 `\` 기준으로 통일한다.
+문서 내 `<leader>` 표기는 현재 Neovim 기본값인 `\` 기준으로 통일한다.
 
 ## 환경 정보
 
 | 항목 | 값 |
 | --- | --- |
-| Neovim | `NVIM v0.12.1` 기준 |
+| Neovim | `NVIM v0.12.1` |
 | OS | macOS, Apple Silicon |
 | 플러그인 매니저 | `folke/lazy.nvim` |
 | Colorscheme | `Mofiqul/dracula.nvim` |
 | Leader key | `\` |
 
-현재 설정의 핵심 방향은 단순하다.
+현재 설정에 포함된 작업 범위는 다음과 같다.
 
 - Go 개발에 필요한 LSP, lint, formatting 흐름을 유지한다.
 - Solidity/Foundry 프로젝트를 열었을 때 LSP, Treesitter, formatting 흐름이 깨지지 않게 한다.
 - 문서 작성과 코드 리뷰 중 자주 쓰는 Git/diff/검색/복사 흐름을 Neovim 안에서 처리한다.
-- 새 플러그인을 많이 설치하기보다, 실제 반복 작업에서 쓰는 기능만 남긴다.
+- 같은 단어를 여러 개 선택해 동시에 수정한다.
 
 ## 플러그인 구성
 
@@ -50,7 +50,7 @@
 | `nvim-telescope/telescope.nvim` | 검색 UI | 파일, grep, buffer, symbol, diagnostics 검색을 담당한다. |
 | `mg979/vim-visual-multi` | multi-cursor 편집 | 같은 단어를 여러 개 선택해 동시에 수정할 때 사용한다. |
 
-이 목록은 “설치하면 좋은 플러그인”을 나열한 것이 아니라, 현재 설정에서 실제 역할이 있는 플러그인만 정리한 것이다. 이후 플러그인을 추가할 때도 먼저 문서에 기능을 늘리는 것이 아니라, 반복 작업에서 불편함이 확인된 뒤 설정에 반영하는 편이 낫다.
+이 목록은 현재 `lazy-lock.json`에 기록된 플러그인 중 사용자가 직접 기능으로 설정한 항목을 정리한 것이다.
 
 ## LSP와 언어별 설정
 
@@ -60,13 +60,13 @@
 
 Go 개발에서는 `gopls`를 기본 LSP로 사용한다. 정의 이동, 참조 조회, hover, code action, rename, format 같은 기본 흐름은 LSP attach 이후 버퍼 로컬 키맵으로 연결한다.
 
-Go 설정에서 중요한 점은 자동완성과 import 정리, lint 흐름을 서로 분리해서 보는 것이다. `nvim-cmp`는 입력 중 후보를 보여주는 역할이고, `gopls`는 Go 심볼과 코드 액션을 제공한다. `golangci-lint`는 별도의 정적 분석 도구로 보고, LSP와 같은 도구처럼 생각하지 않는 편이 혼동이 적다.
+Go 설정에서는 `nvim-cmp`, `gopls`, `golangci-lint`가 각각 다른 역할을 맡는다. `nvim-cmp`는 입력 중 후보를 보여주고, `gopls`는 Go 심볼과 코드 액션을 제공한다. `golangci-lint`는 Mason으로 설치된 별도 정적 분석 도구다.
 
 ### Solidity / Foundry
 
-Solidity 작업을 위해 Treesitter parser와 Solidity LSP를 설정한다. 현재 기준으로는 `solidity_ls_nomicfoundation`을 사용하며, Foundry 프로젝트에서는 `foundry.toml`, `remappings.txt` 같은 파일이 root 판단과 import 해석에 영향을 준다.
+Solidity 작업을 위해 Treesitter parser와 Solidity LSP를 설정한다. 현재 기준으로는 `solidity_ls_nomicfoundation`을 사용하며, `foundry.toml`, `hardhat.config.js`, `hardhat.config.ts`, `remappings.txt`, `package.json`, `.git` 같은 파일이 root 판단에 사용된다.
 
-Solidity 파일은 저장 시 `forge fmt`가 실행되도록 구성되어 있다. 이 방식은 Foundry 프로젝트 안에서는 편리하지만, 모든 Solidity 파일에 항상 안전한 전제는 아니다. 프로젝트 루트가 잘못 잡히거나 Foundry 설정이 없는 파일을 열었을 때는 formatting 동작이 기대와 다를 수 있다. 따라서 저장 후 자동 formatting은 “현재 작업 중인 Foundry 프로젝트에 맞춘 편의 설정”으로 보는 것이 좋다.
+Solidity 파일은 저장 시 `forge fmt`가 실행되도록 구성되어 있다. 이 동작은 `BufWritePost`에서 `*.sol` 파일에만 적용된다. `forge`가 PATH에서 실행 가능하지 않으면 formatting은 실행되지 않는다.
 
 ### Lua
 
@@ -80,9 +80,10 @@ Neovim 설정 자체를 Lua로 작성하기 때문에 `lua_ls`를 사용한다. 
 | `lua-language-server` | Lua LSP | Neovim 설정 작성 보조 |
 | `solidity_ls_nomicfoundation` | Solidity LSP | Solidity 코드 탐색과 진단 |
 | `golangci-lint` | Go lint | Go 정적 분석 |
-| `forge` | Foundry formatter 실행 | 로컬 Foundry 설치 상태에 의존할 수 있음 |
 
-`dlv`는 Go 디버깅 도구로 사용할 수 있지만, 현재 설정에서 실제로 활성화되어 있지 않다면 설치된 도구처럼 문서화하지 않는 편이 낫다. 디버깅을 자주 쓰지 않는 상태에서 `nvim-dap`과 `dlv`를 먼저 문서에 올리면, 실제 사용 흐름보다 설정 설명이 앞서갈 수 있다.
+`dlv`는 현재 Mason 설치 목록에 포함되어 있지 않고, `nvim-dap` 관련 설정도 현재 `init.lua`에 없다.
+
+`forge`는 Mason으로 관리하지 않는다. 현재 PC에서는 `/Users/felix/.foundry/bin/forge`에 설치된 Foundry 실행 파일을 사용하며, Solidity 파일 저장 시 `forge fmt`를 실행하기 전에 `forge`가 PATH에서 실행 가능한지만 확인한다.
 
 ## 자동완성 구성
 
@@ -96,15 +97,15 @@ Neovim 설정 자체를 Lua로 작성하기 때문에 `lua_ls`를 사용한다. 
 | Cmdline | `:` 명령행 입력 후보 |
 | Snippet | LuaSnip 기반 반복 입력 후보 |
 
-자동완성은 편하지만, 모든 입력을 자동완성에 의존하면 오히려 흐름이 느려질 수 있다. 현재 설정에서는 LSP 후보를 우선 사용하되, 문서 작성이나 반복 코드 입력에서는 buffer/path/snippet 후보를 보조적으로 사용한다.
+현재 설정에서는 LSP와 LuaSnip 후보가 우선 그룹으로 등록되어 있고, buffer와 path 후보가 다음 그룹으로 등록되어 있다. `/`, `?` 검색 입력에는 buffer source가 연결되어 있고, `:` 명령행 입력에는 path와 cmdline source가 연결되어 있다.
 
 ## Treesitter와 textobjects
 
-Treesitter는 단순 하이라이트 도구라기보다, 코드를 구조 단위로 이해하기 위한 기반으로 사용한다. 특히 `nvim-treesitter-textobjects`를 함께 사용하면 함수, 인자, class/struct 같은 단위를 직접 선택하거나 복사할 수 있다.
+Treesitter는 하이라이트, foldexpr, indentexpr 설정에 사용된다. `nvim-treesitter-textobjects`는 함수, 인자, class/struct 단위 선택과 이동 키를 제공한다.
 
-예를 들어 리뷰 중 함수 전체를 메신저나 문서로 옮길 때, 수동으로 줄 범위를 맞추기보다 `yaf` 또는 `"+yaf` 같은 조작을 사용할 수 있다. 이 방식은 Go, Solidity처럼 함수 단위로 맥락을 확인하는 일이 많은 코드에서 유용하다.
+현재 설정된 textobject 선택 키에는 `af`, `if`, `ac`, `ic`, `aa`, `ia`가 있다. 이동 키에는 `]f`, `[f`, `]F`, `[F`, `]a`, `[a`가 있다.
 
-다만 textobject 키는 설정에서 실제로 활성화되어 있어야 동작한다. 따라서 치트시트에 키를 적을 때는 “기본 Vim 기능”과 “현재 설정에서 추가한 textobject”를 구분해서 기록하는 편이 좋다.
+`af`, `if`, `ac`, `ic`, `aa`, `ia`는 기본 Vim textobject가 아니라 현재 Treesitter textobjects 설정에서 추가한 키다.
 
 ## Git과 리뷰 도구
 
@@ -117,20 +118,20 @@ Git 관련 기능은 역할을 나눠서 사용한다.
 | 브랜치 범위 비교, 히스토리 diff | `diffview.nvim` |
 | 파일/문자열/심볼 검색 | `telescope.nvim` |
 
-이 구분을 해두면 모든 Git 작업을 하나의 플러그인으로 해결하려고 하지 않아도 된다. 파일 안의 작은 변경은 `gitsigns`, 작업셋 확인은 `fugitive`, 브랜치 단위 리뷰는 `diffview`로 나누는 편이 현재 작업 흐름에는 더 자연스럽다.
+현재 파일의 hunk 이동과 미리보기는 `gitsigns`, Git status와 blame은 `vim-fugitive`, 브랜치 범위 비교와 히스토리 확인은 `diffview.nvim` 키맵에 연결되어 있다.
 
-## Visual Multi와 Neo-tree 키 충돌
+## Visual Multi와 Neo-tree 키
 
-`vim-visual-multi`는 `<C-n>`을 기본 선택 키로 사용한다. 기존 설정에서는 `<C-n>`을 Neo-tree 토글로 사용하고 있었기 때문에 두 기능이 충돌한다.
+`vim-visual-multi`는 `<C-n>`을 기본 선택 키로 사용한다.
 
-현재 설정에서는 `<C-n>`을 visual-multi에 남기고, Neo-tree 토글을 `<leader>e`로 옮긴다. `<leader>e`는 explorer를 여는 키로 의미가 명확하고, multi-cursor 선택에서 `<C-n>`의 반복 입력 빈도가 높기 때문이다.
+현재 설정에서는 `<C-n>`을 visual-multi에 사용하고, Neo-tree 토글은 `<leader>e`에 매핑한다.
 
-| 기능 | 이전 키 | 변경 후 |
-| --- | --- | --- |
-| Neo-tree 토글 | `<C-n>` | `<leader>e` |
-| Visual Multi 단어 선택 | - | `<C-n>` |
+| 기능 | 현재 키 |
+| --- | --- |
+| Neo-tree 토글 | `<leader>e` |
+| Visual Multi 단어 선택 | `<C-n>` |
 
-이 선택은 `<C-n>`이 더 옳은 키라서가 아니다. `vim-visual-multi`의 기본 사용 흐름을 유지하는 편이 학습 비용이 낮고, Neo-tree는 `<leader>e`로 옮겨도 의미가 비교적 명확하다고 판단했기 때문이다.
+현재 `init.lua`에서는 Neo-tree 토글이 `<leader>e`에 매핑되어 있고, `<C-n>`은 Neo-tree 토글로 매핑되어 있지 않다.
 
 설정 예시는 다음과 같다.
 
@@ -154,47 +155,44 @@ vim.keymap.set("n", "<leader>e", ":Neotree toggle<CR>", {
 }
 ```
 
-적용 후에는 최소한 다음을 확인한다.
+현재 설정을 확인할 때는 다음 항목을 확인한다.
 
 1. `<leader>e`로 Neo-tree가 정상 토글되는지 확인한다.
 2. `<C-n>`으로 visual-multi가 같은 단어를 선택하는지 확인한다.
 3. visual-multi 활성화 후 `n`, `N`으로 다음/이전 매치를 추가할 수 있는지 확인한다.
 4. `Esc` 또는 `q`로 visual-multi 모드를 빠져나올 수 있는지 확인한다.
-5. 문서와 치트시트에 남아 있는 `Ctrl+n = Neo-tree` 설명이 모두 `<leader>e`로 갱신되었는지 확인한다.
+5. 문서와 치트시트에 남아 있는 `Ctrl+n = Neo-tree` 설명이 없는지 확인한다.
 
-## 아직 넣지 않은 플러그인과 판단 기준
+## 현재 설정에 없는 플러그인
 
-아래 플러그인들은 바로 설치할 목록이 아니라, 실제 작업 중 불편함이 반복될 때 검토할 후보로 남긴다.
+아래 플러그인들은 현재 `lazy-lock.json`에 없고, `init.lua`에도 설정되어 있지 않다.
 
-| 후보 | 기대 효과 | 판단 기준 |
-| --- | --- | --- |
-| `folke/which-key.nvim` | leader 키 발견성 개선 | leader 조합을 자주 잊을 때 |
-| `kylechui/nvim-surround` | 따옴표, 괄호, 태그 감싸기/교체 | 문자열/태그 편집이 반복될 때 |
-| `numToStr/Comment.nvim` | 주석 토글 통일 | 언어별 주석 조작을 자주 할 때 |
-| `stevearc/conform.nvim` | formatter 관리 통합 | `gofmt`, `forge fmt`, `prettier`, `stylua`가 흩어져 관리될 때 |
-| `folke/todo-comments.nvim` | TODO/FIXME/SECURITY/AUDIT 태그 추적 | 문서, 감사, 배포 메모에서 태그 추적이 필요할 때 |
-| `mfussenegger/nvim-dap` | 디버깅 UI와 breakpoint 흐름 | Go 디버깅을 실제로 자주 하게 될 때 |
-
-현재 기준에서는 `nvim-dap`을 급하게 넣기보다 뒤로 미루는 편이 자연스럽다. 디버깅 자체가 필요 없는 것은 아니지만, 아직 `dlv`도 실제 설정에서 비활성화된 상태라면 문서와 설정이 먼저 앞서가는 구조가 된다.
-
-반대로 `which-key`, `surround`, `Comment`, `conform`은 지금 작업 흐름과 직접 연결된다. 특히 `conform.nvim`은 Go, Solidity, TypeScript, Lua formatting을 한곳에서 관리하고 싶어질 때 검토할 만하다.
+| 플러그인 | 현재 상태 |
+| --- | --- |
+| `folke/which-key.nvim` | 설치되어 있지 않음 |
+| `kylechui/nvim-surround` | 설치되어 있지 않음 |
+| `numToStr/Comment.nvim` | 설치되어 있지 않음 |
+| `stevearc/conform.nvim` | 설치되어 있지 않음 |
+| `folke/todo-comments.nvim` | 설치되어 있지 않음 |
+| `mfussenegger/nvim-dap` | 설치되어 있지 않음 |
 
 ## 설치 후 점검 흐름
 
-처음 설정을 가져온 뒤에는 아래 순서로 확인한다.
+현재 설정 상태를 확인할 때는 아래 명령을 사용한다.
 
 ```vim
 :Lazy
 :Mason
 :LspInfo
 :checkhealth lsp
-:TSInstallInfo
+:checkhealth nvim-treesitter
+:TSUpdate
 ```
 
-Go 파일에서는 `gopls`가 붙는지 확인하고, Solidity 파일에서는 Solidity LSP와 Treesitter parser가 정상 동작하는지 확인한다. Foundry 프로젝트에서는 `.sol` 파일 저장 시 `forge fmt`가 기대한 루트 기준으로 실행되는지도 함께 본다.
+Go 파일에서는 `gopls` attach 상태를 확인하고, Solidity 파일에서는 Solidity LSP와 Treesitter 동작 상태를 확인한다. `.sol` 파일 저장 시에는 `forge fmt` 실행 결과를 확인한다.
 
 ## 정리
 
-현재 Neovim 설정은 더 이상 “Go만을 위한 최소 설정”은 아니다. Go 개발을 중심에 두되, Solidity/Foundry 프로젝트와 문서 작성, 브랜치 리뷰까지 함께 처리하는 개인 개발 환경에 가깝다.
+현재 Neovim 설정은 Go, Lua, Solidity, TypeScript/React, Markdown, Git diff 확인을 포함한다.
 
-따라서 앞으로 설정을 확장할 때는 새 플러그인을 많이 소개하는 것보다, 실제 작업 중 반복되는 불편함을 기준으로 추가 여부를 판단하는 편이 좋다. 문서도 마찬가지로 플러그인 이름보다 “왜 이 설정이 필요한지”, “어떤 작업 흐름에서 쓰는지”를 중심으로 유지하는 것이 나중에 다시 읽기 쉽다.
+현재 문서는 `~/.config/nvim/init.lua`, `~/.config/nvim/lazy-lock.json`, Mason 설치 도구, 로컬 `forge` 설치 상태를 기준으로 작성되어 있다.
